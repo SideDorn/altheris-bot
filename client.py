@@ -23,7 +23,7 @@ async def test(ctx: commands.Context):
 
 @bot.hybrid_command()
 async def fish(ctx: commands.Context, region):
-    regions = ["horrimmia", "triptych_lux"]
+    regions = ["horimmia", "triptych_lux", "sharnoth", "iskald", "lhodikess", "phronesis", "cloudfish", "alqafar"]
 
     @fish.error
     async def flip_error(ctx, error):
@@ -35,7 +35,7 @@ async def fish(ctx: commands.Context, region):
     fishing_results = fish_helper(0, region)
     number = fishing_results[0]
     catch = fishing_results[1]
-    await ctx.send(f'{ctx.author} rolled {number}. You got a {catch}')
+    await ctx.send(f'{ctx.author} rolled {number}. You got {catch}')
 
 
 @bot.event
