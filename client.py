@@ -14,7 +14,7 @@ intents.messages = True
 intents.guilds = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
-
+is_cat = False
 
 
 @bot.hybrid_command()
@@ -22,15 +22,22 @@ async def test(ctx: commands.Context):
     await ctx.send(f'Hello, {ctx.author}, how may I help you? Have you been doing well?')
 
 @bot.hybrid_command()
-async def fish(ctx: commands.Context):
-    fishing_results = fish_helper(0, "Nilgiri")
+async def fish(ctx: commands.Context, region):
+    regions = ["horrimmia, triptych_lux"]
+    @fish.error
+    async def flip_error(ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f'I am sorry, {ctx.author}, you are missing an argument. You require a region. The list of regions are: {regions}')
+    fishing_results = fish_helper(0, region)
     number = fishing_results[0]
     catch = fishing_results[1]
     await ctx.send(f'{ctx.author} rolled {number}. You got a {catch}')
 
+
 @bot.event
 async def on_ready():
     print(f'{bot.user} kidou shimasu!')
+
 
 @bot.event
 async def on_message(message):
