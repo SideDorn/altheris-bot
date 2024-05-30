@@ -66,7 +66,7 @@ def character_gacha(pulls = 1):
 
 
     for i in range(1, pulls + 1):
-        print(i)
+
         gacha_rng_result = randint(1, 100)
         if i == 10:
             catch = pity()
@@ -78,7 +78,7 @@ def character_gacha(pulls = 1):
         elif gacha_rng_result==100:
             catch = choice(ssr)
 
-        pulled_characters.append(gacha_rng_result)
+
         pulled_characters.append(catch)
 
     return pulled_characters
