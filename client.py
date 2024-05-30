@@ -84,13 +84,23 @@ async def inv(ctx: commands.Context):
     user_string = str(user.id)
     inventory_embed = discord.Embed(title = f"{user}'s Inventory", description = "")
     inventory = users[user_string]["Inventory"]
-    if inventory == {}:
-        inventory_embed.description = f'**{user}** has nothing in their inventory.'
-    else:
-        for element in inventory:
-            print(element)
-            count = inventory[element]["Count"]
-            inventory_embed.description += f'{element}: {count}\n' 
+    embed_description = inventory_embed.description
+
+    fish_inventory = inventory["Fish Inventory"]
+    item_inventory = inventory["Item Inventory"]
+    if fish_inventory == {} and item_inventory == {}:
+        embed_description = f'**{user}** has nothing in their inventory.'
+    if fish_inventory != {}:
+        embed_description += f"**Fishes in {user}'s inventory**"
+        for element in fish_inventory:
+            count = fish_inventory[element]["Count"]
+            inventory_embed.description += f'{element}: {count}\n'
+    if item_inventory != {}:
+        embed_description += f"**Items in {user}'s inventory**"
+        for element in item_inventory:
+            count = item_inventory[element]["Count"]
+            inventory_embed.description += f'{element}: {count}\n'
+        
     
     await ctx.send(embed = inventory_embed)
 
