@@ -17,8 +17,7 @@ def slotreward(bet, slot1, slot2, slot3):
         message = "Unfortunately you didn't win. "
         return bet * 0, message
     
-def slotmachine(bet, slot1, slot2, slot3):
-    bet = 100 # placeholder value for now
+def slotmachine(bet):
 
     slot1 = random.randint(1, 12)
     slot2 = random.randint(1, 12)
@@ -28,4 +27,4 @@ def slotmachine(bet, slot1, slot2, slot3):
     reward, message = slotreward(bet, slot1, slot2, slot3)
     print (f"{message}You won {reward} gold!")
 
-slotmachine('bet', 'slot1', 'slot2', 'slot3')
+slotmachine(100) # Testing with a bet value of 100
