@@ -1,11 +1,5 @@
 import random
 
-# 2 of a kind = x2 reward of bet
-# 3 of a kind = x20 reward of bet
-# 3 sevens = x200 reward of bet
-
-# iirc 10 per day limit?
-
 def slotreward(bet, slot1, slot2, slot3):
     if slot1 == slot2 == slot3 == 7:
         return bet * 200
@@ -18,14 +12,16 @@ def slotreward(bet, slot1, slot2, slot3):
     
     else:
         return bet * 0
+    
+def slotmachine(bet, slot1, slot2, slot3):
+    bet = 100 # placeholder value for now
 
-bet = 100 # empty by default 
+    slot1 = random.randint(1, 12)
+    slot2 = random.randint(1, 12)
+    slot3 = random.randint(1, 12)
 
-slot1 = random.randint(1, 12)
-slot2 = random.randint(1, 12)
-slot3 = random.randint(1, 12)
+    print (f"{slot1} / {slot2} / {slot3}")
+    reward = slotreward(bet, slot1, slot2, slot3)
+    print (f"You earned {reward}.")
 
-print (f"{slot1} / {slot2} / {slot3}")
-reward = slotreward(bet, slot1, slot2, slot3)
-print (f"You earned {reward}.")
-
+slotmachine('bet', 'slot1', 'slot2', 'slot3')
