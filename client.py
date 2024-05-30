@@ -14,7 +14,7 @@ intents.messages = True
 intents.guilds = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
-is_cat = False
+
 
 
 @bot.hybrid_command()
