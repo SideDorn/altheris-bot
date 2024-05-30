@@ -5,6 +5,7 @@ from fishing import fish_helper
 from dotenv import load_dotenv
 import re
 import random
+from gacha import character_gacha
 load_dotenv()
 
 token = os.getenv('DISCORD_TOKEN')
@@ -37,6 +38,17 @@ async def fish(ctx: commands.Context, region):
     catch = fishing_results[1]
     await ctx.send(f'{ctx.author} rolled {number}. You got {catch}')
 
+@bot.hybrid_command()
+async def gacha(ctx:commands.Context, pulls = 1):
+
+       
+    if pulls < 1:
+        await ctx.send('Please pull more than once.')
+    elif pulls > 10:
+        await ctx.send(f'{ctx.author}, we need to talk about your gambling addiction. 10 pulls at most, please.')
+    else:
+        gacha_result = character_gacha(pulls)
+        await ctx.send(f'{ctx.author} pulled {pulls} time/s and got the following:\n {gacha_result}')
 
 @bot.event
 async def on_ready():
@@ -54,7 +66,6 @@ async def on_message(message):
     channel = str(message.channel.name)
     if channel == "bot-spam" and user_message[0] != bot.command_prefix:
         print(f'{username} said {user_message} in #{channel}, {message.author}')
-        await message.channel.send(f"hi {username}")
 
     await bot.process_commands(message)
     
