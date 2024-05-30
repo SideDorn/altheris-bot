@@ -89,19 +89,21 @@ async def inv(ctx: commands.Context):
     fish_inventory = inventory["Fish Inventory"]
     item_inventory = inventory["Item Inventory"]
     if fish_inventory == {} and item_inventory == {}:
-        embed_description = f'**{user}** has nothing in their inventory.'
-    if fish_inventory != {}:
-        embed_description += f"**Fishes in {user}'s inventory**"
-        for element in fish_inventory:
-            count = fish_inventory[element]["Count"]
-            inventory_embed.description += f'{element}: {count}\n'
-    if item_inventory != {}:
-        embed_description += f"**Items in {user}'s inventory**"
-        for element in item_inventory:
-            count = item_inventory[element]["Count"]
-            inventory_embed.description += f'{element}: {count}\n'
-        
+        embed_description += f"**{user}** has nothing in their inventory."
+    else:
+        if fish_inventory != {}:
+            embed_description += f"**Fishes in {user}'s inventory**\n"
+            for element in fish_inventory:
+                count = fish_inventory[element]["Count"]
+                embed_description += f'**{element}**: {count}\n'
+        if item_inventory != {}:
+            embed_description += f"**Items in {user}'s inventory**\n"
+            for element in item_inventory:
+                count = item_inventory[element]["Count"]
+                embed_description += f'**{element}**: {count}\n'
     
+    inventory_embed.description = embed_description
+        
     await ctx.send(embed = inventory_embed)
 
 
