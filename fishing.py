@@ -124,6 +124,6 @@ def fish_helper(modifier, region):
         return alqafar_fish(modifier)
     else: return ""
 
-test = fish_helper(0, "horrimmia")
+def add_fish
 
 

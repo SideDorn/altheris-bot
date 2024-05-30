@@ -5,7 +5,11 @@ from fishing import fish_helper
 from dotenv import load_dotenv
 import re
 import random
+import json
 from gacha import character_gacha
+from economy_helper import get_profile_data
+from economy_helper import open_account
+
 load_dotenv()
 
 token = os.getenv('DISCORD_TOKEN')
@@ -39,7 +43,7 @@ async def fish(ctx: commands.Context, region):
     await ctx.send(f'{ctx.author} rolled {number}. You got {catch}')
 
 @bot.hybrid_command()
-async def gacha(ctx:commands.Context, pulls = 1):
+async def gacha(ctx: commands.Context, pulls = 1):
 
        
     if pulls < 1:
@@ -49,6 +53,41 @@ async def gacha(ctx:commands.Context, pulls = 1):
     else:
         gacha_result = character_gacha(pulls)
         await ctx.send(f'{ctx.author} pulled {pulls} time/s and got the following:\n {gacha_result}')
+
+@bot.hybrid_command()
+async def bal(ctx: commands.Context):
+    user = ctx.author
+    open_account(user)
+    users = get_profile_data()
+    user_string = str(user.id)
+
+
+    balance = users[user_string]["Balance"]
+    prismatic_shards = users[user_string]["Prismatic Shards"]
+
+    coin_emoji = '\U0001FA99'
+    diamond_emoji = '\U0001F48E'
+    economy_embed = discord.Embed(title = f'**{user}**',
+                          description = f'{coin_emoji} {balance} \n {diamond_emoji} {prismatic_shards}')
+
+    await ctx.send(embed = economy_embed)
+
+@bot.hybrid_command()
+async def claim(ctx: commands.Context):
+    user = ctx.author
+    open_account(user)
+    users = get_profile_data()
+    user_string = str(user.id)
+
+    users[user_string]["Balance"] += 100
+
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)
+
+ 
+
+    await ctx.send("Your allowance. 100 gold. Don't spend it all in one place, okay?")
+
 
 @bot.event
 async def on_ready():

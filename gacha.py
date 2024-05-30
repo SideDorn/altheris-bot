@@ -90,5 +90,3 @@ def pity():
     if gacha_rng_number == 100:
         return choice(ssr)
     else: return choice(superrare)
-
-print(character_gacha(10))
