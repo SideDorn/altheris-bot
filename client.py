@@ -9,6 +9,8 @@ import json
 from gacha import character_gacha
 from economy_helper import get_profile_data
 from economy_helper import open_account
+from fishing import add_fish
+from fishing import create_inventory
 
 load_dotenv()
 
@@ -40,6 +42,8 @@ async def fish(ctx: commands.Context, region):
     fishing_results = fish_helper(0, region)
     number = fishing_results[0]
     catch = fishing_results[1]
+
+    add_fish(ctx.author, catch)
     await ctx.send(f'{ctx.author} rolled {number}. You got {catch}')
 
 @bot.hybrid_command()
@@ -71,6 +75,25 @@ async def bal(ctx: commands.Context):
                           description = f'{coin_emoji} {balance} \n {diamond_emoji} {prismatic_shards}')
 
     await ctx.send(embed = economy_embed)
+
+@bot.hybrid_command()
+async def inv(ctx: commands.Context):
+    user = ctx.author
+    create_inventory(user)
+    users = get_profile_data()
+    user_string = str(user.id)
+    inventory_embed = discord.Embed(title = f"{user}'s Inventory", description = "")
+    inventory = users[user_string]["Inventory"]
+    if inventory == {}:
+        inventory_embed.description = f'**{user}** has nothing in their inventory.'
+    else:
+        for element in inventory:
+            print(element)
+            count = inventory[element]["Count"]
+            inventory_embed.description += f'{element}: {count}\n' 
+    
+    await ctx.send(embed = inventory_embed)
+
 
 @bot.hybrid_command()
 async def claim(ctx: commands.Context):
