@@ -1,4 +1,7 @@
 import random
+import json
+import os
+from economy_helper import get_profile_data
 
 common_fish = ["Tuna","Salmon","Carp","Guppy"]
 
@@ -124,6 +127,33 @@ def fish_helper(modifier, region):
         return alqafar_fish(modifier)
     else: return ""
 
-def add_fish
+def create_inventory(user):
+    user_string = str(user.id)
+    users = get_profile_data()
+
+    
+    if "Inventory" not in users[user_string]:
+        users[user_string]["Inventory"] = {}
+        with open("la_economia.json", "w") as f:
+            json.dump(users, f)
+    else: return
+
+def add_fish(user, fish):
+    
+    user_string = str(user.id)
+    create_inventory(user)
+    users = get_profile_data()
+    inventory = users[user_string]["Inventory"]
+
+    if fish not in inventory:
+        inventory[fish] = {}
+        inventory[fish]["Count"] = 0
+
+    if fish == "nothing":
+        return
+    
+    inventory[fish]["Count"] += 1
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)
 
 
