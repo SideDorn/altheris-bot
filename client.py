@@ -11,7 +11,7 @@ from economy_helper import get_profile_data
 from economy_helper import open_account
 from fishing import add_fish
 from fishing import create_inventory
-
+from item_name_formatter import format
 load_dotenv()
 
 
@@ -114,7 +114,7 @@ async def sell(ctx: commands.Context, item, amount = 1):
     users = get_profile_data()
     user_string = str(user.id)
     inventory = users[user_string]["Inventory"]
-    item = item.capitalize()
+    item = format(item)
 
     if type(amount) != int:
         await ctx.send("Please enter an integer for the amount of fish. You can't sell half a fish now, can't you?")
