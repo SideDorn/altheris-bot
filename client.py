@@ -65,7 +65,12 @@ async def gacha(ctx: commands.Context, pulls = 1):
         await ctx.send(f'{ctx.author}, we need to talk about your gambling addiction. 10 pulls at most, please.')
     else:
         gacha_result = character_gacha(pulls)
-        await ctx.send(f'{ctx.author} pulled {pulls} time/s and got the following:\n {gacha_result}')
+        pull = ""
+    for element in gacha_result:
+        pull += f"{element}\n"
+
+    await ctx.send(f"{ctx.author} pulled {pulls} time/s and got the following:\n{pull}")
+
 
 @bot.hybrid_command()
 async def bal(ctx: commands.Context):
