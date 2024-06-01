@@ -116,6 +116,9 @@ async def sell(ctx: commands.Context, item, amount = 1):
     inventory = users[user_string]["Inventory"]
     item = format(item)
 
+    
+    if item not in fish_prices:
+        await ctx.send(f"I'm sorry, {user}, {item} is not an item.")
     if type(amount) != int:
         await ctx.send("Please enter an integer for the amount of fish. You can't sell half a fish now, can't you?")
     elif amount <= 0:
@@ -133,8 +136,7 @@ async def sell(ctx: commands.Context, item, amount = 1):
         #elif item in item_prices:
             # count = item_count
         #add item prices if it gets added
-        if item not in fish_prices:
-            await ctx.send(f"I'm sorry, {user}, {item} is not an item.")
+
         if not in_inventory:
             await ctx.send(f"I'm sorry, {user}, you do not have any {item} at the moment")
         #add or item count when items get implemented :3
