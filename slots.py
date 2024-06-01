@@ -23,8 +23,8 @@ def slotmachine(bet):
     slot2 = random.randint(1, 12)
     slot3 = random.randint(1, 12)
 
-    print (f"{slot1} / {slot2} / {slot3}")
+    results = f"{slot1} / {slot2} / {slot3}"
     reward, message = slotreward(bet, slot1, slot2, slot3)
-    print (f"{message}You won {reward} gold!")
+    return results, reward, message
 
-slotmachine(100) # Testing with a bet value of 100
+ # Testing with a bet value of 100
