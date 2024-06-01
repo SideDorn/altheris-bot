@@ -54,6 +54,10 @@ async def fish(ctx: commands.Context, region):
     add_fish(ctx.author, catch)
     await ctx.send(f'{ctx.author} rolled {number}. You got {catch}')
 
+
+
+
+
 #economy stuff here 
 @bot.hybrid_command()
 async def gacha(ctx: commands.Context, pulls = 1):
@@ -67,17 +71,40 @@ async def gacha(ctx: commands.Context, pulls = 1):
     prismatic_shards = users[user_string]["Prismatic Shards"]
 
 
-    if 130*pulls > {prismatic_shards}:
-        await ctx.send(f'{ctx.author}, you do not have enough shards for this transaction. Come back when you have enough.') 
-    else:    
-            if pulls < 1:
-                await ctx.send('Please pull more than once.')
-            elif pulls > 10:
-                await ctx.send(f'{ctx.author}, we need to talk about your gambling addiction. 10 pulls at most, please.')
-            else:
-                gacha_result = character_gacha(pulls)
-                await ctx.send(f'{ctx.author} pulled {pulls} time/s and got the following:\n {gacha_result}')
+    
 
+    if 130*pulls > prismatic_shards:
+        await ctx.send(f'{ctx.author}, you do not have enough shards for this transaction. Come back when you have enough.')   
+    else: 
+        if pulls < 1:
+            await ctx.send('Please pull more than once.')
+        elif pulls > 10:
+            await ctx.send(f'{ctx.author}, we need to talk about your gambling addiction. 10 pulls at most, please.')
+        else:
+            gacha_result = character_gacha(pulls)
+            pull = ""
+            ctr = 0
+        for element in gacha_result:
+            ctr+=1
+            if ctr % 2 == 0:
+                pull += f"{element}\n"
+            else:
+                pull += f"{element}\n"
+
+
+        #Unused Code for Embed
+                #pull += f"{element}\t\t\t\t\t\t" 
+        # gacha_embed = discord.Embed(title = f'**{user}**',
+        #         description = f' {balance} \n {prismatic_shards}', )          
+        # await ctx.send(embed = gacha_embed)
+
+
+
+        await ctx.send(f"{ctx.author} pulled {pulls} time/s and got the following:\n{pull}")
+        users[user_string]["Prismatic Shards"] -= 130*pulls
+
+        with open("la_economia.json", "w") as f:
+            json.dump(users, f)
 
 
 @bot.hybrid_command()
@@ -254,13 +281,43 @@ async def claim(ctx: commands.Context):
         await ctx.send("Here's today's share, 100 gold and 1300 shards. Don't spend it all at once, okay?")
     else:
         users[user_string]["Balance"] = 100
-        await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible with your money next time, okay?")
+        await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible, okay?")
 
     with open("la_economia.json", "w") as f:
         json.dump(users, f)
 
  
+@bot.hybrid_command()
+async def donate(ctx: commands.Context, receiver: discord.Member, donation=0):
+    user = ctx.author
+    open_account(user)
+    open_account(receiver)
+    users = get_profile_data()
+    user_string = str(user.id)
+    receiver_string = str (receiver.id)
 
+    userbalance = users[user_string]["Balance"]
+
+
+    if user==receiver:
+        await ctx.send("You can't just give yourself money, try again.")
+    else:
+        if donation<0:
+            await ctx.send("Stealing's bad! Don't try that again.")
+        elif donation==0:
+            await ctx.send("Why are you holding out an empty hand? I'm not holding that.")
+        else:
+            if userbalance <= 0:
+                await ctx.send("You can't donate on an empty wallet.")
+            elif userbalance < donation:
+                await ctx.send("You can't give what you don't have. Try again.")    
+            else:
+                users[user_string]["Balance"] -= donation
+                users[receiver_string]["Balance"] += donation
+                await ctx.send(f"{user} donated {donation} to {receiver}. Quite generous.")
+
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)
 
 
 
