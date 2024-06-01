@@ -118,6 +118,7 @@ async def inv(ctx: commands.Context):
 @bot.hybrid_command()
 async def sell(ctx: commands.Context, item, amount = 1):
     user = ctx.author
+    open_account(user)
     users = get_profile_data()
     user_string = str(user.id)
     inventory = users[user_string]["Inventory"]
@@ -163,11 +164,13 @@ async def sell(ctx: commands.Context, item, amount = 1):
 @bot.hybrid_command()
 async def race(ctx: commands.Context, golem, bet = 5):
     user = ctx.author
+    open_account(user)
+    user = ctx.author
     users = get_profile_data()
     user_string = str(user.id)
     golem = format(golem)
     
-    is_valid_bet = bet_checker(ctx, bet, user_string)
+    is_valid_bet = await bet_checker(ctx, bet, user_string)
     if golem not in ["Wood", "Stone", "Metal", "Magma"]:
         await ctx.send("Please bet on a proper golem: Wood, Stone, Metal, and Magma.")
     elif is_valid_bet:
@@ -203,6 +206,7 @@ async def race(ctx: commands.Context, golem, bet = 5):
 @bot.hybrid_command()
 async def slots(ctx:commands.Context, bet = 5):
     user = ctx.author
+    open_account(user)
     users = get_profile_data()
     user_string = str(user.id)
     is_valid_bet = await bet_checker(ctx, bet, user_string)
