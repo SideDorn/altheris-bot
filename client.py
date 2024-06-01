@@ -251,7 +251,7 @@ async def claim(ctx: commands.Context):
     if users[user_string]["Balance"] >= -100:
         users[user_string]["Balance"] += 100
         users[user_string]["Prismatic Shards"] += 1300
-        await ctx.send("Here's today's share, 100 gold and 1300 shards. Don't spend it all in one place, okay?")
+        await ctx.send("Here's today's share, 100 gold and 1300 shards. Don't spend it all at once, okay?")
     else:
         users[user_string]["Balance"] = 100
         await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible with your money next time, okay?")
