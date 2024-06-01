@@ -25,3 +25,13 @@ def get_profile_data():
 def update_economy(updated_json):
     with open("la_economia.json", 'r') as f:
         json.dump(updated_json, f)
+
+def change_balance(user_string: str, added_money):
+    users = get_profile_data()
+    balance = users[user_string]["Balance"]
+    balance += added_money
+
+    users[user_string]["Balance"] = balance
+
+    with open("la_economia.json", 'r') as f:
+        json.dump(users, f)

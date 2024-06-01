@@ -12,6 +12,7 @@ from economy_helper import open_account
 from fishing import add_fish
 from fishing import create_inventory
 from item_name_formatter import format
+from racing import golem_race
 load_dotenv()
 
 
@@ -26,10 +27,12 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
 
+#schizo
 @bot.hybrid_command()
 async def test(ctx: commands.Context):
     await ctx.send(f'Hello, {ctx.author}, how may I help you? Have you been doing well?')
 
+#fishing
 @bot.hybrid_command()
 async def fish(ctx: commands.Context, region):
     regions = ["horimmia", "triptych_lux", "sharnoth", "iskald", "lhodikess", "phronesis", "cloudfish", "alqafar"]
@@ -48,6 +51,7 @@ async def fish(ctx: commands.Context, region):
     add_fish(ctx.author, catch)
     await ctx.send(f'{ctx.author} rolled {number}. You got {catch}')
 
+#economy stuff here 
 @bot.hybrid_command()
 async def gacha(ctx: commands.Context, pulls = 1):
 
@@ -142,7 +146,6 @@ async def sell(ctx: commands.Context, item, amount = 1):
         #add or item count when items get implemented :3
         elif fish_count >= amount:
             price = fish_prices[item] * amount
-            print(users[user_string]["Balance"])
             users[user_string]["Balance"] += price
             users[user_string]["Inventory"]["Fish Inventory"][item]["Count"] -= amount
 
@@ -152,6 +155,50 @@ async def sell(ctx: commands.Context, item, amount = 1):
         else:
             await ctx.send(f"I'm sorry, {user}, you don't have enough of {item}. Currently, you have {count} {item}s")
 
+# casino commands here 
+
+@bot.hybrid_command()
+async def race(ctx: commands.Context, golem, bet = 5):
+    user = ctx.author
+    users = get_profile_data()
+    user_string = str(user.id)
+    golem = format(golem)
+
+    if golem not in ["Wood", "Stone", "Metal", "Magma"]:
+        await ctx.send("Please bet on a proper golem: Wood, Stone, Metal, and Magma.")
+    elif bet < 5:
+        await ctx.send(f"{user}, please take note that the minimum bet is 5 gold. Thank you.")
+    elif bet > users[user_string]["Balance"]:
+        await ctx.send(f"{user}, please don't bet more than what you have.")
+    else:
+
+        results = golem_race()
+        print(results)
+        first_place = results[0]
+        second_place = results[1]
+        third_place = results[2]
+        fourth_place = results[3]
+
+        if golem == first_place:
+            winnings = 10 * bet
+            await ctx.send(f"Congratulations, your {golem} Golem won first place! You won {winnings} Gold!")
+        elif golem == second_place:
+            winnings = 2 * bet
+            await ctx.send(f"Congratulations, your {golem} Golem won second place! You won {winnings} Gold!")
+        elif golem == third_place:
+            winnings = -2 * bet
+            await ctx.send(f"Unlucky, your {golem} Golem got third place. You lost {-winnings} Gold.")       
+        elif golem == fourth_place:
+            winnings = -10 * bet
+            await ctx.send(f"Ouch, your {golem} Golem got last. You lost {-winnings} Gold.") 
+
+
+        users[user_string]["Balance"] += winnings
+
+        with open("la_economia.json", "w") as f:
+            json.dump(users, f)   
+
+        await ctx.send(f"Final standings: \n **{results}**")
 
 @bot.hybrid_command()
 async def claim(ctx: commands.Context):

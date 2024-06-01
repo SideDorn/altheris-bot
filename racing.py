@@ -1,9 +1,12 @@
 import random
 
-golem = ["Wood", "Stone", "Metal", "Magma"]
-winner = random.choice(golem)
+def golem_race():
+    golem = ["Wood", "Stone", "Metal", "Magma"]
+    random.shuffle(golem)
 
-print(f"{winner} is the winner of the race!")
+    return golem
+
+
 
 
 # Bet Rewards Reference
