@@ -63,4 +63,4 @@ def pity():
         return "[SSR] " + choice(ssr)
     else: return "[SR] " + choice(superrare)
 
-print(character_gacha(10))
+#print(character_gacha(10))

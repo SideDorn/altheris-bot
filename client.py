@@ -301,6 +301,9 @@ async def donate(ctx: commands.Context, receiver: discord.Member, donation=0):
 
     if user==receiver:
         await ctx.send("You can't just give yourself money, try again.")
+    elif receiver.id==bot:
+        users[user_string]["Balance"] -= donation
+        await ctx.send(f"For me? Thanks for the {donation} gold, {user}. ")  
     else:
         if donation<0:
             await ctx.send("Stealing's bad! Don't try that again.")
@@ -310,7 +313,8 @@ async def donate(ctx: commands.Context, receiver: discord.Member, donation=0):
             if userbalance <= 0:
                 await ctx.send("You can't donate on an empty wallet.")
             elif userbalance < donation:
-                await ctx.send("You can't give what you don't have. Try again.")    
+                await ctx.send("You can't give what you don't have. Try again.")  
+   
             else:
                 users[user_string]["Balance"] -= donation
                 users[receiver_string]["Balance"] += donation
