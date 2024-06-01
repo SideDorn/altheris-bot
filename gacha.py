@@ -36,34 +36,6 @@ def character_gacha(pulls = 1):
     # SR = 15%
 
 
-    rare = ["Wood Golem",
-            "Scrap Golem",
-            "Magma Golem",
-            "Divine Golem",
-            "Stone Golem",
-            "Fire Golem",
-            "Water Golem",
-            "Ice Golem",
-            "Earth Golem",
-            "Wind Golem"]
-    superrare = ["Suzaku Hinomiya",
-                "Rina",
-                "Sir Tarcus Flammenwohl",
-                "Lind Akeldama",
-                "Jahlagtas",
-                "Alan Voidwalker",
-                "Oomfie Ellier",
-                "Arghena",
-                "Astaroth",
-                "Tia Hellsflame"]
-    ssr = ["Aranlyre Diceroll",
-        "Rita Dorchadas",
-        "Ezekiel Guangming",
-        "Daiyousei",
-        "Zhiraion Gaffot",
-        "Finana Ryugu",
-        "Kane Cannequis"]
-
 
     for i in range(1, pulls + 1):
 
@@ -71,12 +43,12 @@ def character_gacha(pulls = 1):
         if i == 10:
             catch = pity()
         elif gacha_rng_result>=1 and gacha_rng_result<=84:
-            catch = choice(rare)
+            catch = "[R] " + choice(rare)
         elif gacha_rng_result>=85 and gacha_rng_result<=99:
-            catch = choice(superrare)
+            catch = "[SR] " + choice(superrare)
 
         elif gacha_rng_result==100:
-            catch = choice(ssr)
+            catch = "[SSR] " + choice(ssr)
 
 
         pulled_characters.append(catch)
@@ -88,5 +60,7 @@ def pity():
     gacha_rng_number = randint(1, 100)
 
     if gacha_rng_number == 100:
-        return choice(ssr)
-    else: return choice(superrare)
+        return "[SSR] " + choice(ssr)
+    else: return "[SR] " + choice(superrare)
+
+print(character_gacha(10))
