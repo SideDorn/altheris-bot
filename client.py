@@ -278,7 +278,7 @@ async def claim(ctx: commands.Context):
     if users[user_string]["Balance"] >= -100:
         users[user_string]["Balance"] += 100
         users[user_string]["Prismatic Shards"] += 1300
-        await ctx.send("Here's today's share, 100 gold and 1300 shards. Don't spend it all at once, okay?")
+        await ctx.send(f"Here's today's share, {user}. 100 gold and 1300 shards. Don't spend it all at once, okay?")
     else:
         users[user_string]["Balance"] = 100
         await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible, okay?")
@@ -299,26 +299,25 @@ async def donate(ctx: commands.Context, receiver: discord.Member, donation=0):
     userbalance = users[user_string]["Balance"]
 
 
-    if user==receiver:
-        await ctx.send("You can't just give yourself money, try again.")
-    elif receiver.id==bot:
-        users[user_string]["Balance"] -= donation
-        await ctx.send(f"For me? Thanks for the {donation} gold, {user}. ")  
+ 
+    if donation<0:
+        await ctx.send("Stealing's bad! Don't try that again.")
+    elif donation==0:
+        await ctx.send("Why are you holding out an empty hand? I'm not holding that.")
     else:
-        if donation<0:
-            await ctx.send("Stealing's bad! Don't try that again.")
-        elif donation==0:
-            await ctx.send("Why are you holding out an empty hand? I'm not holding that.")
+        if userbalance <= 0:
+            await ctx.send("You can't donate on an empty wallet.")
+        elif userbalance < donation:
+            await ctx.send("You can't give what you don't have. Try again.")  
+        elif user==receiver:
+            await ctx.send("You can't just give yourself money, try again.")
+        elif receiver.id==1245076712841154580:
+            users[user_string]["Balance"] -= donation
+            await ctx.send(f"For me? Thanks for the {donation} gold, {user}. ")         
         else:
-            if userbalance <= 0:
-                await ctx.send("You can't donate on an empty wallet.")
-            elif userbalance < donation:
-                await ctx.send("You can't give what you don't have. Try again.")  
-   
-            else:
-                users[user_string]["Balance"] -= donation
-                users[receiver_string]["Balance"] += donation
-                await ctx.send(f"{user} donated {donation} to {receiver}. Quite generous.")
+            users[user_string]["Balance"] -= donation
+            users[receiver_string]["Balance"] += donation
+            await ctx.send(f"{user} donated {donation} to {receiver}. Quite generous.")
 
     with open("la_economia.json", "w") as f:
         json.dump(users, f)
