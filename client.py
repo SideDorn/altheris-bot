@@ -14,6 +14,7 @@ from fishing import create_inventory
 
 load_dotenv()
 
+
 token = os.getenv('DISCORD_TOKEN')
 #gives perms to bot
 intents = discord.Intents.default()
@@ -22,7 +23,8 @@ intents.guilds = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-
+with open("fish_prices.json", 'r') as f:
+    fish_prices = json.load(f)
 
 @bot.hybrid_command()
 async def test(ctx: commands.Context):
@@ -106,6 +108,48 @@ async def inv(ctx: commands.Context):
         
     await ctx.send(embed = inventory_embed)
 
+@bot.hybrid_command()
+async def sell(ctx: commands.Context, item, amount = 1):
+    user = ctx.author
+    users = get_profile_data()
+    user_string = str(user.id)
+    inventory = users[user_string]["Inventory"]
+    item = item.capitalize()
+
+    if type(amount) != int:
+        await ctx.send("Please enter an integer for the amount of fish. You can't sell half a fish now, can't you?")
+    elif amount <= 0:
+        await ctx.send("...Huh?")
+    else:
+        fish_inventory = inventory["Fish Inventory"]
+        item_inventory = inventory["Item Inventory"]
+        in_inventory = item in item_inventory or item in fish_inventory
+        
+        fish_count = fish_inventory[item]["Count"]
+        # item_count = item_inventory[item]["Count"]
+
+        if item in fish_prices:
+            count = fish_count
+        #elif item in item_prices:
+            # count = item_count
+        #add item prices if it gets added
+        if item not in fish_prices:
+            await ctx.send(f"I'm sorry, {user}, {item} is not an item.")
+        if not in_inventory:
+            await ctx.send(f"I'm sorry, {user}, you do not have any {item} at the moment")
+        #add or item count when items get implemented :3
+        elif fish_count >= amount:
+            price = fish_prices[item] * amount
+            print(users[user_string]["Balance"])
+            users[user_string]["Balance"] += price
+            users[user_string]["Inventory"]["Fish Inventory"][item]["Count"] -= amount
+
+            with open("la_economia.json", "w") as f:
+                json.dump(users, f)
+            await ctx.send(f"{amount} {item}/s sold for {price} gold!")
+        else:
+            await ctx.send(f"I'm sorry, {user}, you don't have enough of {item}. Currently, you have {count} {item}s")
+
 
 @bot.hybrid_command()
 async def claim(ctx: commands.Context):
@@ -146,3 +190,7 @@ async def on_message(message):
 
 
 bot.run(token)
+
+
+
+        
