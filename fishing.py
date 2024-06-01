@@ -146,7 +146,6 @@ def add_fish(user, fish):
     
     user_string = str(user.id)
     create_inventory(user)
-    print("fish inventory created")
     users = get_profile_data()
     fish_inventory = users[user_string]["Inventory"]["Fish Inventory"]
 
