@@ -57,15 +57,28 @@ async def fish(ctx: commands.Context, region):
 #economy stuff here 
 @bot.hybrid_command()
 async def gacha(ctx: commands.Context, pulls = 1):
+    user = ctx.author
+    open_account(user)
+    users = get_profile_data()
+    user_string = str(user.id)
 
-       
-    if pulls < 1:
-        await ctx.send('Please pull more than once.')
-    elif pulls > 10:
-        await ctx.send(f'{ctx.author}, we need to talk about your gambling addiction. 10 pulls at most, please.')
-    else:
-        gacha_result = character_gacha(pulls)
-        await ctx.send(f'{ctx.author} pulled {pulls} time/s and got the following:\n {gacha_result}')
+
+    balance = users[user_string]["Balance"]
+    prismatic_shards = users[user_string]["Prismatic Shards"]
+
+
+    if 130*pulls > {prismatic_shards}:
+        await ctx.send(f'{ctx.author}, you do not have enough shards for this transaction. Come back when you have enough.') 
+    else:    
+            if pulls < 1:
+                await ctx.send('Please pull more than once.')
+            elif pulls > 10:
+                await ctx.send(f'{ctx.author}, we need to talk about your gambling addiction. 10 pulls at most, please.')
+            else:
+                gacha_result = character_gacha(pulls)
+                await ctx.send(f'{ctx.author} pulled {pulls} time/s and got the following:\n {gacha_result}')
+
+
 
 @bot.hybrid_command()
 async def bal(ctx: commands.Context):
@@ -233,10 +246,12 @@ async def claim(ctx: commands.Context):
     open_account(user)
     users = get_profile_data()
     user_string = str(user.id)
+    
 
     if users[user_string]["Balance"] >= -100:
         users[user_string]["Balance"] += 100
-        await ctx.send("Your allowance. 100 gold. Don't spend it all in one place, okay?")
+        users[user_string]["Prismatic Shards"] += 1300
+        await ctx.send("Here's today's share, 100 gold and 1300 shards. Don't spend it all in one place, okay?")
     else:
         users[user_string]["Balance"] = 100
         await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible with your money next time, okay?")
