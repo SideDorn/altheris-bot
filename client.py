@@ -12,6 +12,10 @@ from economy_helper import open_account
 from fishing import add_fish
 from fishing import create_inventory
 from item_name_formatter import format
+from racing import golem_race
+from slots import slotmachine
+from time import sleep
+from casino_helper import bet_checker
 load_dotenv()
 
 
@@ -26,10 +30,12 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
 
+#schizo
 @bot.hybrid_command()
 async def test(ctx: commands.Context):
     await ctx.send(f'Hello, {ctx.author}, how may I help you? Have you been doing well?')
 
+#fishing
 @bot.hybrid_command()
 async def fish(ctx: commands.Context, region):
     regions = ["horimmia", "triptych_lux", "sharnoth", "iskald", "lhodikess", "phronesis", "cloudfish", "alqafar"]
@@ -48,6 +54,7 @@ async def fish(ctx: commands.Context, region):
     add_fish(ctx.author, catch)
     await ctx.send(f'{ctx.author} rolled {number}. You got {catch}')
 
+#economy stuff here 
 @bot.hybrid_command()
 async def gacha(ctx: commands.Context, pulls = 1):
 
@@ -111,6 +118,7 @@ async def inv(ctx: commands.Context):
 @bot.hybrid_command()
 async def sell(ctx: commands.Context, item, amount = 1):
     user = ctx.author
+    open_account(user)
     users = get_profile_data()
     user_string = str(user.id)
     inventory = users[user_string]["Inventory"]
@@ -142,7 +150,6 @@ async def sell(ctx: commands.Context, item, amount = 1):
         #add or item count when items get implemented :3
         elif fish_count >= amount:
             price = fish_prices[item] * amount
-            print(users[user_string]["Balance"])
             users[user_string]["Balance"] += price
             users[user_string]["Inventory"]["Fish Inventory"][item]["Count"] -= amount
 
@@ -152,6 +159,73 @@ async def sell(ctx: commands.Context, item, amount = 1):
         else:
             await ctx.send(f"I'm sorry, {user}, you don't have enough of {item}. Currently, you have {count} {item}s")
 
+# casino commands here 
+
+@bot.hybrid_command()
+async def race(ctx: commands.Context, golem, bet = 5):
+    user = ctx.author
+    open_account(user)
+    user = ctx.author
+    users = get_profile_data()
+    user_string = str(user.id)
+    golem = format(golem)
+    
+    is_valid_bet = await bet_checker(ctx, bet, user_string)
+    if golem not in ["Wood", "Stone", "Metal", "Magma"]:
+        await ctx.send("Please bet on a proper golem: Wood, Stone, Metal, and Magma.")
+    elif is_valid_bet:
+        users[user_string]["Balance"] -= bet
+        results = golem_race()
+        print(results)
+        first_place = results[0]
+        second_place = results[1]
+        third_place = results[2]
+        fourth_place = results[3]
+
+        if golem == first_place:
+            winnings = 10 * bet
+            await ctx.send(f"Congratulations, your {golem} Golem won first place! You won {winnings} Gold!")
+        elif golem == second_place:
+            winnings = 2 * bet
+            await ctx.send(f"Congratulations, your {golem} Golem won second place! You won {winnings} Gold!")
+        elif golem == third_place:
+            winnings = -2 * bet
+            await ctx.send(f"Unlucky, your {golem} Golem got third place. You lost {-winnings} Gold.")       
+        elif golem == fourth_place:
+            winnings = -10 * bet
+            await ctx.send(f"Ouch, your {golem} Golem got last. You lost {-winnings} Gold.") 
+
+
+        users[user_string]["Balance"] += winnings
+
+        with open("la_economia.json", "w") as f:
+            json.dump(users, f)   
+
+        await ctx.send(f"Final standings for {user}'s race: \n **{results}**")
+
+@bot.hybrid_command()
+async def slots(ctx:commands.Context, bet = 5):
+    user = ctx.author
+    open_account(user)
+    users = get_profile_data()
+    user_string = str(user.id)
+    is_valid_bet = await bet_checker(ctx, bet, user_string)
+
+    if is_valid_bet:
+        users[user_string]["Balance"] -= bet
+        results, reward, message = slotmachine(bet)
+        await ctx.send("Loading results...")
+        sleep(2)
+        await ctx.send(results)
+        if reward != 0:
+            await ctx.send((f"{message}{user} won {reward} gold!"))
+        else:
+            await ctx.send(f"Unfortunately, {user} won nothing.")
+
+        users[user_string]["Balance"] += reward
+
+        with open("la_economia.json", "w") as f:
+            json.dump(users, f)
 
 @bot.hybrid_command()
 async def claim(ctx: commands.Context):
@@ -160,14 +234,19 @@ async def claim(ctx: commands.Context):
     users = get_profile_data()
     user_string = str(user.id)
 
-    users[user_string]["Balance"] += 100
+    if users[user_string]["Balance"] >= -100:
+        users[user_string]["Balance"] += 100
+        await ctx.send("Your allowance. 100 gold. Don't spend it all in one place, okay?")
+    else:
+        users[user_string]["Balance"] = 100
+        await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible with your money next time, okay?")
 
     with open("la_economia.json", "w") as f:
         json.dump(users, f)
 
  
 
-    await ctx.send("Your allowance. 100 gold. Don't spend it all in one place, okay?")
+
 
 
 @bot.event
