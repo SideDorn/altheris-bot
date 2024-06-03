@@ -3,6 +3,7 @@ import json
 import os
 from economy_helper import get_profile_data
 from economy_helper import open_account
+from item_name_formatter import format
 
 common_fish = ["Tuna","Salmon","Carp","Guppy"]
 
@@ -143,7 +144,7 @@ def create_inventory(user):
 
     
 def add_fish(user, fish):
-    
+
     user_string = str(user.id)
     create_inventory(user)
     users = get_profile_data()
@@ -160,4 +161,19 @@ def add_fish(user, fish):
     with open("la_economia.json", "w") as f:
         json.dump(users, f)
 
+# def sell_fish(ctx, user, fish, count = 1):
+#     fish = format(fish)
+#     user_string = str(user.id)
+#     create_inventory(user)
+#     users = get_profile_data()
+#     fish_inventory = users[user_string]["Inventory"]["Fish Inventory"]
+
+#     if fish not in fish_inventory or fish_inventory[fish]:
+#         ctx.send(f"Sorry{}")
+
+    
+#     fish_inventory[fish]["Count"] -= 1
+#     users[user_string]["Balance"] += 
+#     with open("la_economia.json", "w") as f:
+#         json.dump(users, f)
 

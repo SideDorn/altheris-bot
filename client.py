@@ -29,7 +29,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
-
+with open("shop_items.json", "r") as f:
+    shop_prices = json.load(f)
 #schizo
 @bot.hybrid_command()
 async def test(ctx: commands.Context):
@@ -146,7 +147,7 @@ async def inv(ctx: commands.Context):
                 count = fish_inventory[element]["Count"]
                 embed_description += f'**{element}**: {count}\n'
         if item_inventory != {}:
-            embed_description += f"**Items in {user}'s inventory**\n"
+            embed_description += f"\n**Items in {user}'s inventory**\n"
             for element in item_inventory:
                 count = item_inventory[element]["Count"]
                 embed_description += f'**{element}**: {count}\n'
@@ -167,8 +168,6 @@ async def sell(ctx: commands.Context, item, amount = 1):
     
     if item not in fish_prices:
         await ctx.send(f"I'm sorry, {user}, {item} is not an item.")
-    if type(amount) != int:
-        await ctx.send("Please enter an integer for the amount of fish. You can't sell half a fish now, can't you?")
     elif amount <= 0:
         await ctx.send("...Huh?")
     else:
@@ -199,6 +198,48 @@ async def sell(ctx: commands.Context, item, amount = 1):
         else:
             await ctx.send(f"I'm sorry, {user}, you don't have enough of {item}. Currently, you have {count} {item}s")
 
+@bot.hybrid_command()
+async def buy(ctx: commands.Context, item, amount = 1):
+    user = ctx.author
+    open_account(user)
+    users = get_profile_data()
+    user_string = str(user.id)
+    inventory = users[user_string]["Inventory"]
+    item = format(item)
+
+    if item not in shop_prices:
+        await ctx.send(f"I'm sorry., {user}, we don't have {item} at the moment. Please check again later!")
+    elif amount < 0:
+        await ctx.send("Are you trying to scam me?")
+    else:
+        cost = shop_prices[item] * amount
+        
+
+        if cost > users[user_string]["Balance"]:
+            await ctx.send("You do not have enough money for this transaction.")
+        
+        else:  
+            if item not in inventory:
+                users[user_string]["Inventory"]["Item Inventory"][item] = {"Count": 0}
+            
+            users[user_string]["Balance"] -= cost
+            users[user_string]["Inventory"]["Item Inventory"][item]["Count"] += amount
+
+            with open("la_economia.json", "w") as f:
+                json.dump(users, f)
+            await ctx.send(f"{amount} {item}/s bought for {cost} gold!")
+    
+@bot.hybrid_command()
+async def shop(ctx:commands.Context):
+    embed = discord.Embed(title = "**Altheris' Shop**", description = "")
+    for element in shop_prices:
+        embed.description += f"**{element}** ({shop_prices[element]} G) \n"
+
+    await ctx.send(embed = embed)
+
+
+
+        
 # casino commands here 
 
 @bot.hybrid_command()
