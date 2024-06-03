@@ -9,6 +9,8 @@ import json
 from gacha import character_gacha
 from economy_helper import get_profile_data
 from economy_helper import open_account
+from economy_helper import open_keyitems
+from economy_helper import get_keyitem_data
 from fishing import add_fish
 from fishing import create_inventory
 from item_name_formatter import format
@@ -32,6 +34,8 @@ with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
 with open("shop_items.json", "r") as f:
     shop_prices = json.load(f)
+with open("keyshop_items.json", "r") as f:
+    keyshop_prices = json.load(f)
 with open("rod_modifiers.json", "r") as f:
     rod_modifiers = json.load(f)
 
@@ -220,7 +224,7 @@ async def buy(ctx: commands.Context, item, amount = 1):
     create_inventory(user)
     users = get_profile_data()
     user_string = str(user.id)
-    inventory = users[user_string]["Inventory"]
+    inventory = users[user_string]["Inventory"]["Item Inventory"]
     item = format(item)
 
     if item not in shop_prices:
@@ -253,8 +257,86 @@ async def shop(ctx:commands.Context):
 
     await ctx.send(embed = embed)
 
+@bot.hybrid_command()
+async def kshop(ctx:commands.Context):
+    user = ctx.author
+    open_keyitems(user)
+    users = get_keyitem_data()
+    user_string = str(user.id)
+    inventory = users[user_string]["Inventory"]
+    key_items = ["Alqafari Fishing Pass",
+                 "Phronesian Fishing Pass",
+                 "Horrimian Fishing Pass",
+                 "Quetzalian Fishing Pass",
+                 "Iskaldian Fishing Pass",
+                 "Guangming Fishing Pass",
+                 "Proxima Fishing Pass",
+                 "Outer Lands Fishing Pass"]
+    embed = discord.Embed(title = "**Altheris' Trading Center**", description = "What will you be buying today?\n")
+    for element in key_items:
+        if element not in inventory:
+            embed.description += f"**{element}** ({keyshop_prices[element]})\n"
 
+    await ctx.send(embed = embed)
 
+@bot.hybrid_command()
+async def kinv(ctx: commands.Context):
+    user = ctx.author
+    open_keyitems(user)
+    keyitems = get_keyitem_data()
+    user_string = str(user.id)
+
+    inventory_embed = discord.Embed(title = f"{user}'s Key Items", description = "")
+    inventory = keyitems[user_string]["Inventory"]
+    embed_description = inventory_embed.description
+
+    if inventory == {}:
+        embed_description += f"**{user}** has no key items."
+    else:
+        if inventory != {}:
+            embed_description += f"**{user}'s key items**\n"
+            for element in inventory:
+                embed_description += f'**{element}**\n'
+        
+    inventory_embed.description = embed_description   
+    await ctx.send(embed = inventory_embed)
+
+    
+@bot.hybrid_command()
+async def kbuy(ctx: commands.Context, item):
+    user = ctx.author
+    open_account(user)
+    open_keyitems(user)
+    users = get_profile_data()
+    keyitems = get_keyitem_data()
+    user_string = str(user.id)
+    item = format(item)
+    inventory = keyitems[user_string]["Inventory"]
+    #Expand to add conditionals for key items being exchanged for specific items
+    #Only gold exchange is supported currently
+    #good luck xid i hope u dont rope
+    if item not in keyshop_prices:
+        await ctx.send(f"I'm sorry., {user}, what exactly are you trying to buy here?")
+    #elif amount < 0:
+    #    await ctx.send("Are you trying to scam me?")
+    #elif amount == 0:
+    #    await ctx.send("You can't just ask for nothing. Try again.")    
+    else:
+        cost = keyshop_prices[item]
+        
+        if cost > users[user_string]["Balance"]:
+            await ctx.send("You do not have enough money for this transaction.")   
+        else:              
+            if item not in inventory:
+                keyitems[user_string]["Inventory"][item] = {}
+            
+            users[user_string]["Balance"] -= cost
+
+            with open("la_economia.json", "w") as f:
+                json.dump(users, f) # change balance
+            with open("keyitems.json", "w") as f:
+                json.dump(keyitems, f) #add to kinv
+            await ctx.send(f"{item} has been bought for {cost} {coin_emoji}. Congratulations.")
         
 # casino commands here 
 
