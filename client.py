@@ -46,6 +46,7 @@ with open("rod_modifiers.json", "r") as f:
 async def test(ctx: commands.Context):
     await ctx.send(f'Hello, {ctx.author}, how may I help you? Have you been doing well?')
 
+
 #fishing
 @bot.hybrid_command()
 async def fish(ctx: commands.Context, region):
@@ -150,6 +151,8 @@ async def inv(ctx: commands.Context):
     user = ctx.author
     create_inventory(user)
     users = get_profile_data()
+    key_items_owned = get_keyitem_data()
+    open_keyitems(user)
     user_string = str(user.id)
     inventory_embed = discord.Embed(title = f"{user}'s Inventory", description = "")
     inventory = users[user_string]["Inventory"]
@@ -157,19 +160,24 @@ async def inv(ctx: commands.Context):
 
     fish_inventory = inventory["Fish Inventory"]
     item_inventory = inventory["Item Inventory"]
-    if fish_inventory == {} and item_inventory == {}:
+    key_item_inventory = key_items_owned[user_string]["Inventory"]
+    if fish_inventory == {} and item_inventory == {} and key_item_inventory == {}:
         embed_description += f"**{user}** has nothing in their inventory."
     else:
         if fish_inventory != {}:
-            embed_description += f"**Fishes in {user}'s inventory**\n"
+            embed_description += f"# Fishes\n"
             for element in fish_inventory:
                 count = fish_inventory[element]["Count"]
                 embed_description += f'**{element}**: {count}\n'
         if item_inventory != {}:
-            embed_description += f"\n**Items in {user}'s inventory**\n"
+            embed_description += f"# Items\n"
             for element in item_inventory:
                 count = item_inventory[element]["Count"]
                 embed_description += f'**{element}**: {count}\n'
+        if key_item_inventory != {}:
+            embed_description += f"# Key Items\n"
+            for element in key_item_inventory:
+                embed_description += f"**{element}**\n"
     
     inventory_embed.description = embed_description
         
@@ -222,122 +230,75 @@ async def buy(ctx: commands.Context, item, amount = 1):
     user = ctx.author
     open_account(user)
     create_inventory(user)
+    key_items = get_keyitem_data()
     users = get_profile_data()
     user_string = str(user.id)
     inventory = users[user_string]["Inventory"]["Item Inventory"]
+    key_inventory = key_items[user_string]["Inventory"]
     item = format(item)
+    bought = False
 
-    if item not in shop_prices:
+    if item not in shop_prices and item not in keyshop_prices:
         await ctx.send(f"I'm sorry., {user}, we don't have {item} at the moment. Please check again later!")
     elif amount < 0:
         await ctx.send("Are you trying to scam me?")
     else:
-        cost = shop_prices[item] * amount
-        
 
-        if cost > users[user_string]["Balance"]:
-            await ctx.send("You do not have enough money for this transaction.")
-        
-        else:  
-            if item not in inventory:
-                users[user_string]["Inventory"]["Item Inventory"][item] = {"Count": 0}
-            
-            users[user_string]["Balance"] -= cost
-            users[user_string]["Inventory"]["Item Inventory"][item]["Count"] += amount
 
-            with open("la_economia.json", "w") as f:
-                json.dump(users, f)
+        if item in shop_prices:
+            cost = shop_prices[item] * amount
+    
+            if cost > users[user_string]["Balance"]:
+                await ctx.send("You do not have enough money for this transaction.")
+            else:
+                if item not in inventory:
+                    users[user_string]["Inventory"]["Item Inventory"][item] = {"Count": 0}
+                    
+
+                users[user_string]["Inventory"]["Item Inventory"][item]["Count"] += amount
+                users[user_string]["Balance"] -= cost
+                bought = True
+
+        elif item in keyshop_prices:
+            cost = keyshop_prices[item]
+            if cost > users[user_string]["Balance"]:
+                await ctx.send("You do not have enough money for this transaction.")
+            elif item not in key_inventory:
+                key_items[user_string]["Inventory"][item] = {}
+                users[user_string]["Balance"] -= cost
+                bought = True
+            else: await ctx.send(f"You already have the key item: **{item}**")
+                
+        
+        with open("la_economia.json", "w") as f:
+            json.dump(users, f)
+        with open("keyitems.json", "w") as f:
+            json.dump(key_items, f)
+        if bought:
             await ctx.send(f"{amount} {item}/s bought for {cost} {coin_emoji}!")
     
 @bot.hybrid_command()
 async def shop(ctx:commands.Context):
-    embed = discord.Embed(title = "**Altheris' Shop**", description = "")
+    user = ctx.author
+    open_keyitems(user)
+    key_items_per_player = get_keyitem_data()
+    user_string = str(user.id)
+    key_items_owned = key_items_per_player[user_string]["Inventory"]
+
+
+    embed = discord.Embed(title = "**Altheris' Shop**", description = "# Normal Shop\n")
     for element in shop_prices:
-        embed.description += f"**{element}** ({shop_prices[element]} G) \n"
+        embed.description += f"**{element}** ({shop_prices[element]} {coin_emoji}) \n"
+    embed.description += "\n# Key Item Shop\n"
+    for element in keyshop_prices:
+
+        if element not in key_items_owned:
+            embed.description += f"**{element}** ({keyshop_prices[element]}{coin_emoji})\n"
 
     await ctx.send(embed = embed)
-
-@bot.hybrid_command()
-async def kshop(ctx:commands.Context):
-    user = ctx.author
-    open_keyitems(user)
-    users = get_keyitem_data()
-    user_string = str(user.id)
-    inventory = users[user_string]["Inventory"]
-    key_items = ["Alqafari Fishing Pass",
-                 "Phronesian Fishing Pass",
-                 "Horrimian Fishing Pass",
-                 "Quetzalian Fishing Pass",
-                 "Iskaldian Fishing Pass",
-                 "Guangming Fishing Pass",
-                 "Proxima Fishing Pass",
-                 "Outer Lands Fishing Pass"]
-    embed = discord.Embed(title = "**Altheris' Trading Center**", description = "What will you be buying today?\n")
-    for element in key_items:
-        if element not in inventory:
-            embed.description += f"**{element}** ({keyshop_prices[element]})\n"
-
-    await ctx.send(embed = embed)
-
-@bot.hybrid_command()
-async def kinv(ctx: commands.Context):
-    user = ctx.author
-    open_keyitems(user)
-    keyitems = get_keyitem_data()
-    user_string = str(user.id)
-
-    inventory_embed = discord.Embed(title = f"{user}'s Key Items", description = "")
-    inventory = keyitems[user_string]["Inventory"]
-    embed_description = inventory_embed.description
-
-    if inventory == {}:
-        embed_description += f"**{user}** has no key items."
-    else:
-        if inventory != {}:
-            embed_description += f"**{user}'s key items**\n"
-            for element in inventory:
-                embed_description += f'**{element}**\n'
-        
-    inventory_embed.description = embed_description   
-    await ctx.send(embed = inventory_embed)
 
     
-@bot.hybrid_command()
-async def kbuy(ctx: commands.Context, item):
-    user = ctx.author
-    open_account(user)
-    open_keyitems(user)
-    users = get_profile_data()
-    keyitems = get_keyitem_data()
-    user_string = str(user.id)
-    item = format(item)
-    inventory = keyitems[user_string]["Inventory"]
-    #Expand to add conditionals for key items being exchanged for specific items
-    #Only gold exchange is supported currently
-    #good luck xid i hope u dont rope
-    if item not in keyshop_prices:
-        await ctx.send(f"I'm sorry., {user}, what exactly are you trying to buy here?")
-    #elif amount < 0:
-    #    await ctx.send("Are you trying to scam me?")
-    #elif amount == 0:
-    #    await ctx.send("You can't just ask for nothing. Try again.")    
-    else:
-        cost = keyshop_prices[item]
-        
-        if cost > users[user_string]["Balance"]:
-            await ctx.send("You do not have enough money for this transaction.")   
-        else:              
-            if item not in inventory:
-                keyitems[user_string]["Inventory"][item] = {}
-            
-            users[user_string]["Balance"] -= cost
 
-            with open("la_economia.json", "w") as f:
-                json.dump(users, f) # change balance
-            with open("keyitems.json", "w") as f:
-                json.dump(keyitems, f) #add to kinv
-            await ctx.send(f"{item} has been bought for {cost} {coin_emoji}. Congratulations.")
-        
 # casino commands here 
 
 @bot.hybrid_command()
