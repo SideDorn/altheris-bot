@@ -435,20 +435,23 @@ async def equip(ctx: commands.Context, item):
     item = format(item)
     user = ctx.author
     users = get_profile_data()
+    key_items = get_keyitem_data()
     create_inventory(user)
     user_string = str(user.id)
 
-    inventory = users[user_string]["Inventory"]["Item Inventory"]
+    inventory = key_items[user_string]["Inventory"]
 
     if item not in inventory:
         await ctx.send(f"{user}, you don't have {item}")
     else:
-        users[user_string]["Inventory"]["Item Inventory"]["Default Rod"] = {"Count": 1}
+        key_items[user_string]["Inventory"]["Default Rod"] = {}
         users[user_string]["Equipped"] = item
         await ctx.send(f"{user} has equipped {item}")
 
     with open("la_economia.json", "w") as f:
-        json.dump(users, f)   
+        json.dump(users, f)  
+    with open("keyitems.json", "w") as f:
+        json.dump(key_items, f)
 
 
 
