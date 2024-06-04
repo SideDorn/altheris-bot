@@ -33,6 +33,16 @@ def open_keyitems(user):
     with open("keyitems.json", "w") as f:
         json.dump(keyitems, f)
 
+def start_character_log(user):
+    user_string = str(user.id)
+    users = get_profile_data()
+
+    if "Characters" not in users[user_string]["Inventory"]:
+        users[user_string]["Inventory"]["Characters"] = {}
+    
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)
+        
 def get_keyitem_data():
     with open("keyitems.json", 'r') as f:
         keyitems = json.load(f)

@@ -8,6 +8,7 @@ import random
 import json
 from gacha import character_gacha
 from economy_helper import get_profile_data
+from economy_helper import start_character_log
 from economy_helper import open_account
 from economy_helper import open_keyitems
 from economy_helper import get_keyitem_data
@@ -53,6 +54,9 @@ async def shika(ctx:commands.Context):
 @bot.hybrid_command()
 async def しか(ctx:commands.Context):
     await ctx.send('しかのこのこのここしたんたん \U0001F5E3\U0001F5E3\U0001F5E3 \n https://www.youtube.com/watch?v=dCEMSaho0io')    
+
+
+
 #fishing
 @bot.hybrid_command()
 async def fish(ctx: commands.Context, region):
@@ -90,11 +94,12 @@ async def fish(ctx: commands.Context, region):
 async def gacha(ctx: commands.Context, pulls = 1):
     user = ctx.author
     open_account(user)
+    create_inventory(user)
+    start_character_log(user)
     users = get_profile_data()
     user_string = str(user.id)
 
-
-    balance = users[user_string]["Balance"]
+    characters = users[user_string]["Inventory"]["Characters"]
     prismatic_shards = users[user_string]["Prismatic Shards"]
 
 
@@ -112,6 +117,15 @@ async def gacha(ctx: commands.Context, pulls = 1):
             pull = ""
             ctr = 0
         for element in gacha_result:
+
+            words = element.split(" ")
+            words = words[1:] 
+            character = ' '.join(words)  
+            if character not in characters:
+                users[user_string]["Inventory"]["Characters"][character] = {"Count": 1}
+            else:
+                users[user_string]["Inventory"]["Characters"][character]["Count"] += 1
+
             ctr+=1
             if ctr % 2 == 0:
                 pull += f"{element}\n"
@@ -155,9 +169,11 @@ async def bal(ctx: commands.Context):
 async def inv(ctx: commands.Context):
     user = ctx.author
     create_inventory(user)
+    open_keyitems(user)
+    start_character_log(user)
     users = get_profile_data()
     key_items_owned = get_keyitem_data()
-    open_keyitems(user)
+
     user_string = str(user.id)
     inventory_embed = discord.Embed(title = f"{user}'s Inventory", description = "")
     inventory = users[user_string]["Inventory"]
@@ -166,6 +182,7 @@ async def inv(ctx: commands.Context):
     fish_inventory = inventory["Fish Inventory"]
     item_inventory = inventory["Item Inventory"]
     key_item_inventory = key_items_owned[user_string]["Inventory"]
+    characters_owned = inventory["Characters"]
     if fish_inventory == {} and item_inventory == {} and key_item_inventory == {}:
         embed_description += f"**{user}** has nothing in their inventory."
     else:
@@ -183,6 +200,11 @@ async def inv(ctx: commands.Context):
             embed_description += f"# Key Items\n"
             for element in key_item_inventory:
                 embed_description += f"**{element}**\n"
+        if characters_owned != {}:
+            embed_description += f"# Characters Owned\n"
+            for element in characters_owned:
+                count = characters_owned[element]["Count"]
+                embed_description += f"**{element}**: {count} \n"
     
     inventory_embed.description = embed_description
         
@@ -432,9 +454,10 @@ async def donate(ctx: commands.Context, receiver: discord.Member, donation=0):
 async def equip(ctx: commands.Context, item):
     item = format(item)
     user = ctx.author
+    create_inventory(user)
     users = get_profile_data()
     key_items = get_keyitem_data()
-    create_inventory(user)
+    
     user_string = str(user.id)
 
     inventory = key_items[user_string]["Inventory"]
