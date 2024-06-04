@@ -74,7 +74,6 @@ async def fish(ctx: commands.Context, region):
         await ctx.send(f"That region is not available. Please use one of the following: {regions}")
     
     modifier = rod_modifiers[equipped_rod]
-    print(rod_modifiers)
     fishing_results = fish_helper(modifier, region)
     number = fishing_results[0]
     catch = fishing_results[1]
@@ -322,7 +321,6 @@ async def race(ctx: commands.Context, golem, bet = 5):
     elif is_valid_bet:
         users[user_string]["Balance"] -= bet
         results = golem_race()
-        print(results)
         first_place = results[0]
         second_place = results[1]
         third_place = results[2]
@@ -441,8 +439,10 @@ async def equip(ctx: commands.Context, item):
 
     inventory = key_items[user_string]["Inventory"]
 
-    if item not in inventory:
+    if item not in inventory and item not in users[user_string]["Inventory"]["Item Inventory"]:
         await ctx.send(f"{user}, you don't have {item}")
+    elif item not in rod_modifiers:
+        await ctx.send(f"Um, {user}? You're not supposed to use {item} to fish...")
     else:
         key_items[user_string]["Inventory"]["Default Rod"] = {}
         users[user_string]["Equipped"] = item
