@@ -46,7 +46,13 @@ with open("rod_modifiers.json", "r") as f:
 async def test(ctx: commands.Context):
     await ctx.send(f'Hello, {ctx.author}, how may I help you? Have you been doing well?')
 
+@bot.hybrid_command()
+async def shika(ctx:commands.Context):
+    await ctx.send('Shikanokonokonokokoshitantan \U0001F5E3\U0001F5E3\U0001F5E3 \n https://www.youtube.com/watch?v=dCEMSaho0io')
 
+@bot.hybrid_command()
+async def しか(ctx:commands.Context):
+    await ctx.send('しかのこのこのここしたんたん \U0001F5E3\U0001F5E3\U0001F5E3 \n https://www.youtube.com/watch?v=dCEMSaho0io')    
 #fishing
 @bot.hybrid_command()
 async def fish(ctx: commands.Context, region):
