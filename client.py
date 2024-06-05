@@ -14,6 +14,7 @@ from economy_helper import open_keyitems
 from economy_helper import get_keyitem_data
 from fishing import add_fish
 from fishing import create_inventory
+from gacha import rare, superrare, ssr
 from item_name_formatter import format
 from racing import golem_race
 from slots import slotmachine
@@ -31,6 +32,9 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 coin_emoji = '\U0001FA99'
 diamond_emoji = '\U0001F48E'
+remoji = '\U0001F539'
+sremoji = '\U0001F537'
+ssremoji = '\U0001F536'
 with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
 with open("shop_items.json", "r") as f:
@@ -205,25 +209,42 @@ async def inv(ctx: commands.Context):
     await ctx.send(embed = inventory_embed)
 
 @bot.hybrid_command()
-async def chars(ctx: commands.Context):
+async def chars(ctx: commands.Context, tier = "all"):
     user = ctx.author
     create_inventory(user)
     start_character_log(user)
     users = get_profile_data()
 
-
+    tier = tier.lower()
     user_string = str(user.id)
-    character_embed = discord.Embed(title = f"{user}'s Owned Characters", description = "")
-    inventory = users[user_string]["Inventory"]
-    embed_description = character_embed.description
-    characters_owned = inventory["Characters"]
 
+    inventory = users[user_string]["Inventory"]
+    embed_description = ""
+    characters_owned = inventory["Characters"]
+    rare_embed = ""
+    sr_embed = ""
+    ssr_embed = ""
     if characters_owned != {}:
         for element in characters_owned:
             count = characters_owned[element]["Count"]
-            embed_description += f"**{element}**: {count} \n"
+            if element in rare:
+                rare_embed += f"{remoji} **{element}**: {count} \n"
+            elif element in superrare:
+                sr_embed += f"{sremoji} **{element}**: {count} \n"
+            elif element in ssr:
+                ssr_embed += f"{ssremoji} **{element}**: {count} \n"
+            embed_description = f"# Rare:\n{rare_embed}\n# SR: \n{sr_embed}\n# SSR:\n{ssr_embed}"
     
-    character_embed.description = embed_description
+    if tier == "all":
+        character_embed = discord.Embed(title = f"{user}'s Owned Characters", description = embed_description)
+    elif tier == "r":
+        character_embed = discord.Embed(title = f"{user}'s Owned Rare Characters", description = rare_embed)
+    elif tier == "sr":
+        character_embed = discord.Embed(title = f"{user}'s Owned SR Characters", description = sr_embed)
+    elif tier == "ssr":
+        character_embed = discord.Embed(title = f"{user}'s Owned SSR Characters", description = ssr_embed)
+    else:
+        character_embed = discord.Embed(title = "Sorry, this is not a tier.", description = "Please choose from R, SR, and SSR.")
         
     await ctx.send(embed = character_embed)
 
