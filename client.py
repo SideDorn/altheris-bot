@@ -404,9 +404,10 @@ async def seticon(ctx:commands.Context, setchar):
     characters_owned = inventory["Characters"]
     iconlink = ""
 
+
+    #add check to see if character exists
     if setchar not in characters_owned:
-        await ctx.send(f"You don't have this character, {user}.")
-        
+        await ctx.send(f"You don't have this character, {user}.")    
     else:
         if "Icon" in char_modifiers[setchar]:
             iconlink = char_modifiers[setchar]["Icon"]

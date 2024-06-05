@@ -1,15 +1,16 @@
 {
-    "Aranlyre Diceroll": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/aranlyrediceroll.png"},
-    "Rita Dorchadas": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ritadorchadas.png"},
-    "Ezekiel Guangming": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ezekielguangming.png"},
-    "Daiyousei": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/daiyousei.png"},
-    "Zhiraion Gaffot": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/zhiraiongaffot.png"},
-    "Finana Ryugu": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/finanaryugu.png"},
-    "Kane Cannequis": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/kanecannequis.png"},
+    "Aranlyre Diceroll": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/aranlyrediceroll.png"},
+    "Rita Dorchadas": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/ritadorchadas.png"},
+    "Ezekiel Guangming": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/ezekielguangming.png"},
+    "Daiyousei": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/daiyousei.png"},
+    "Zhiraion Gaffot": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/zhiraiongaffot.png"},
+    "Finana Ryugu": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/finanaryugu.png"},
+    "Kane Cannequis": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/kanecannequis.png"},
 
-    "Suzaku Hinomiya":{},
-    "Rina":{},
-    "Sir Tarcus Flammenwohl":{},
-    "Oomfie Ellier":{},
-    "Tia Hellsflame":{}
+    "Suzaku Hinomiya":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/suzakuhinomiya.png"},
+    "Rina":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/rina.png"},
+    "Sir Tarcus Flammenwohl":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/sirtarcus.png"},
+    "Oomfie Ellier":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/oomfieellier.png"},
+    "Tia Hellsflame":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/tiahellsflame.png"}
 }
+
