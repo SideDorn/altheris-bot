@@ -224,16 +224,20 @@ async def chars(ctx: commands.Context, tier = "all"):
     rare_embed = ""
     sr_embed = ""
     ssr_embed = ""
+    embed_description = ""
     if characters_owned != {}:
         for element in characters_owned:
             count = characters_owned[element]["Count"]
             if element in rare:
                 rare_embed += f"{remoji} **{element}**: {count} \n"
+                embed_description += f"{remoji} **{element}**: {count} \n"
             elif element in superrare:
                 sr_embed += f"{sremoji} **{element}**: {count} \n"
+                embed_description += f"{sremoji} **{element}**: {count} \n"
             elif element in ssr:
                 ssr_embed += f"{ssremoji} **{element}**: {count} \n"
-            embed_description = f"# Rare:\n{rare_embed}\n# SR: \n{sr_embed}\n# SSR:\n{ssr_embed}"
+                embed_description += f"{ssremoji} **{element}**: {count} \n"
+            
     
     if tier == "all":
         character_embed = discord.Embed(title = f"{user}'s Owned Characters", description = embed_description)
