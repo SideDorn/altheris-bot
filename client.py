@@ -182,7 +182,7 @@ async def inv(ctx: commands.Context):
     fish_inventory = inventory["Fish Inventory"]
     item_inventory = inventory["Item Inventory"]
     key_item_inventory = key_items_owned[user_string]["Inventory"]
-    characters_owned = inventory["Characters"]
+
     if fish_inventory == {} and item_inventory == {} and key_item_inventory == {}:
         embed_description += f"**{user}** has nothing in their inventory."
     else:
@@ -200,15 +200,32 @@ async def inv(ctx: commands.Context):
             embed_description += f"# Key Items\n"
             for element in key_item_inventory:
                 embed_description += f"**{element}**\n"
-        if characters_owned != {}:
-            embed_description += f"# Characters Owned\n"
-            for element in characters_owned:
-                count = characters_owned[element]["Count"]
-                embed_description += f"**{element}**: {count} \n"
     
     inventory_embed.description = embed_description
-        
     await ctx.send(embed = inventory_embed)
+
+@bot.hybrid_command()
+async def chars(ctx: commands.Context):
+    user = ctx.author
+    create_inventory(user)
+    start_character_log(user)
+    users = get_profile_data()
+
+
+    user_string = str(user.id)
+    character_embed = discord.Embed(title = f"{user}'s Owned Characters", description = "")
+    inventory = users[user_string]["Inventory"]
+    embed_description = character_embed.description
+    characters_owned = inventory["Characters"]
+
+    if characters_owned != {}:
+        for element in characters_owned:
+            count = characters_owned[element]["Count"]
+            embed_description += f"**{element}**: {count} \n"
+    
+    character_embed.description = embed_description
+        
+    await ctx.send(embed = character_embed)
 
 @bot.hybrid_command()
 async def sell(ctx: commands.Context, item, amount = 1):
