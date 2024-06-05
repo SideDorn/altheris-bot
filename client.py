@@ -177,12 +177,18 @@ async def profile(ctx: commands.Context):
     else:
         equipped_rod = users[user_string]["Equipped"]
 
+    if "Persona" not in users[user_string]:
+        users[user_string]["Persona"] = {}
+        persona = "No ID equipped."
+    else:
+        persona = users[user_string]["Persona"]
+
 
     economy_embed = discord.Embed(
         title = f'**{user}**\'s Profile',
         #description = f'{coin_emoji} {balance} \n {diamond_emoji} {prismatic_shards}'
         )
-    economy_embed.add_field(name = "Aranlyre Diceroll", value = 'STR 1 | DEX 1 | CON 1 | INT 1 | WIS 1 | CHA 1', #placeholder
+    economy_embed.add_field(name = f'{persona}', value = 'STR 1 | DEX 1 | CON 1 | INT 1 | WIS 1 | CHA 1', #placeholder
                             #description = "STR 1\tDEX 1\tCON 1\tINT 1\tWIS 1\tCHA 1"
                             inline = False
                             )
@@ -422,7 +428,30 @@ async def seticon(ctx:commands.Context, setchar):
         json.dump(users, f)   
 
 
+@bot.hybrid_command()
+async def setchar(ctx:commands.Context, setchar):
+    user = ctx.author
+    create_inventory(user)
+    start_character_log(user)
+    users = get_profile_data()
+    setchar = format(setchar)
+    #tier = tier.lower()
+    user_string = str(user.id)
 
+    inventory = users[user_string]["Inventory"]
+    characters_owned = inventory["Characters"]
+
+
+
+    #add check to see if character exists
+    if setchar not in characters_owned:
+        await ctx.send(f"You don't have this character, {user}.")    
+    else:
+        users[user_string]["Persona"] = setchar
+        await ctx.send(f"{user} has set their character to {setchar}.")
+
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)   
     
 
 # casino commands here 
