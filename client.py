@@ -35,6 +35,7 @@ diamond_emoji = '\U0001F48E'
 remoji = '\U0001F539'
 sremoji = '\U0001F537'
 ssremoji = '\U0001F536'
+rodemoji = '\U0001F3A3'
 with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
 with open("shop_items.json", "r") as f:
@@ -153,7 +154,7 @@ async def gacha(ctx: commands.Context, pulls = 1):
 
 
 @bot.hybrid_command()
-async def bal(ctx: commands.Context):
+async def profile(ctx: commands.Context):
     user = ctx.author
     open_account(user)
     users = get_profile_data()
@@ -162,10 +163,26 @@ async def bal(ctx: commands.Context):
 
     balance = users[user_string]["Balance"]
     prismatic_shards = users[user_string]["Prismatic Shards"]
+    if "Equipped" not in users[user_string]:
+        users[user_string]["Equipped"] = {}
+        equipped_rod = "No rod equipped"
+    else:
+        equipped_rod = users[user_string]["Equipped"]
 
 
-    economy_embed = discord.Embed(title = f'**{user}**',
-                          description = f'{coin_emoji} {balance} \n {diamond_emoji} {prismatic_shards}')
+    economy_embed = discord.Embed(
+        title = f'**{user}**\'s Profile',
+        #description = f'{coin_emoji} {balance} \n {diamond_emoji} {prismatic_shards}'
+        )
+    economy_embed.add_field(name = "Aranlyre Diceroll", value = 'STR 1 | DEX 1 | CON 1 | INT 1 | WIS 1 | CHA 1', #placeholder
+                            #description = "STR 1\tDEX 1\tCON 1\tINT 1\tWIS 1\tCHA 1"
+                            inline = False
+                            )
+    economy_embed.set_thumbnail(url='https://asteria.s-ul.eu/CzedhEhn.png',)
+    economy_embed.add_field(name = "Gold", value = f'{coin_emoji} {balance}', inline = True)
+    economy_embed.add_field(name = "Equipped Rod", value = f'{rodemoji} {equipped_rod}', inline = True)
+    economy_embed.add_field(name = "Prismatic Shards", value = f'{diamond_emoji} {prismatic_shards}', inline = False)
+
 
     await ctx.send(embed = economy_embed)
 
@@ -354,12 +371,12 @@ async def shop(ctx:commands.Context):
 
     embed = discord.Embed(title = "**Altheris' Shop**", description = "# Normal Shop\n")
     for element in shop_prices:
-        embed.description += f"**{element}** ({shop_prices[element]} {coin_emoji}) \n"
+        embed.description += f"**{element}** ({coin_emoji}{shop_prices[element]}) \n"
     embed.description += "\n# Key Item Shop\n"
     for element in keyshop_prices:
 
         if element not in key_items_owned:
-            embed.description += f"**{element}** ({keyshop_prices[element]}{coin_emoji})\n"
+            embed.description += f"**{element}** ({coin_emoji}{keyshop_prices[element]})\n"
 
     await ctx.send(embed = embed)
 
@@ -514,8 +531,6 @@ async def equip(ctx: commands.Context, item):
         json.dump(users, f)  
     with open("keyitems.json", "w") as f:
         json.dump(key_items, f)
-
-
 
 
 @bot.event
