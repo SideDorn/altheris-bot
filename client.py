@@ -8,9 +8,13 @@ import random
 import json
 from gacha import character_gacha
 from economy_helper import get_profile_data
+from economy_helper import start_character_log
 from economy_helper import open_account
+from economy_helper import open_keyitems
+from economy_helper import get_keyitem_data
 from fishing import add_fish
 from fishing import create_inventory
+from gacha import rare, superrare, ssr
 from item_name_formatter import format
 from racing import golem_race
 from slots import slotmachine
@@ -28,10 +32,15 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 coin_emoji = '\U0001FA99'
 diamond_emoji = '\U0001F48E'
+remoji = '\U0001F539'
+sremoji = '\U0001F537'
+ssremoji = '\U0001F536'
 with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
 with open("shop_items.json", "r") as f:
     shop_prices = json.load(f)
+with open("keyshop_items.json", "r") as f:
+    keyshop_prices = json.load(f)
 with open("rod_modifiers.json", "r") as f:
     rod_modifiers = json.load(f)
 
@@ -41,6 +50,16 @@ with open("rod_modifiers.json", "r") as f:
 @bot.hybrid_command()
 async def test(ctx: commands.Context):
     await ctx.send(f'Hello, {ctx.author}, how may I help you? Have you been doing well?')
+
+@bot.hybrid_command()
+async def shika(ctx:commands.Context):
+    await ctx.send('Shikanokonokonokokoshitantan \U0001F5E3\U0001F5E3\U0001F5E3 \n https://www.youtube.com/watch?v=dCEMSaho0io')
+
+@bot.hybrid_command()
+async def しか(ctx:commands.Context):
+    await ctx.send('しかのこのこのここしたんたん \U0001F5E3\U0001F5E3\U0001F5E3 \n https://www.youtube.com/watch?v=dCEMSaho0io')    
+
+
 
 #fishing
 @bot.hybrid_command()
@@ -63,7 +82,6 @@ async def fish(ctx: commands.Context, region):
         await ctx.send(f"That region is not available. Please use one of the following: {regions}")
     
     modifier = rod_modifiers[equipped_rod]
-    print(rod_modifiers)
     fishing_results = fish_helper(modifier, region)
     number = fishing_results[0]
     catch = fishing_results[1]
@@ -80,11 +98,12 @@ async def fish(ctx: commands.Context, region):
 async def gacha(ctx: commands.Context, pulls = 1):
     user = ctx.author
     open_account(user)
+    create_inventory(user)
+    start_character_log(user)
     users = get_profile_data()
     user_string = str(user.id)
 
-
-    balance = users[user_string]["Balance"]
+    characters = users[user_string]["Inventory"]["Characters"]
     prismatic_shards = users[user_string]["Prismatic Shards"]
 
 
@@ -102,6 +121,15 @@ async def gacha(ctx: commands.Context, pulls = 1):
             pull = ""
             ctr = 0
         for element in gacha_result:
+
+            words = element.split(" ")
+            words = words[1:] 
+            character = ' '.join(words)  
+            if character not in characters:
+                users[user_string]["Inventory"]["Characters"][character] = {"Count": 1}
+            else:
+                users[user_string]["Inventory"]["Characters"][character]["Count"] += 1
+
             ctr+=1
             if ctr % 2 == 0:
                 pull += f"{element}\n"
@@ -145,7 +173,11 @@ async def bal(ctx: commands.Context):
 async def inv(ctx: commands.Context):
     user = ctx.author
     create_inventory(user)
+    open_keyitems(user)
+    start_character_log(user)
     users = get_profile_data()
+    key_items_owned = get_keyitem_data()
+
     user_string = str(user.id)
     inventory_embed = discord.Embed(title = f"{user}'s Inventory", description = "")
     inventory = users[user_string]["Inventory"]
@@ -153,23 +185,69 @@ async def inv(ctx: commands.Context):
 
     fish_inventory = inventory["Fish Inventory"]
     item_inventory = inventory["Item Inventory"]
-    if fish_inventory == {} and item_inventory == {}:
+    key_item_inventory = key_items_owned[user_string]["Inventory"]
+
+    if fish_inventory == {} and item_inventory == {} and key_item_inventory == {}:
         embed_description += f"**{user}** has nothing in their inventory."
     else:
         if fish_inventory != {}:
-            embed_description += f"**Fishes in {user}'s inventory**\n"
+            embed_description += f"# Fishes\n"
             for element in fish_inventory:
                 count = fish_inventory[element]["Count"]
                 embed_description += f'**{element}**: {count}\n'
         if item_inventory != {}:
-            embed_description += f"\n**Items in {user}'s inventory**\n"
+            embed_description += f"# Items\n"
             for element in item_inventory:
                 count = item_inventory[element]["Count"]
                 embed_description += f'**{element}**: {count}\n'
+        if key_item_inventory != {}:
+            embed_description += f"# Key Items\n"
+            for element in key_item_inventory:
+                embed_description += f"**{element}**\n"
     
     inventory_embed.description = embed_description
-        
     await ctx.send(embed = inventory_embed)
+
+@bot.hybrid_command()
+async def chars(ctx: commands.Context, tier = "all"):
+    user = ctx.author
+    create_inventory(user)
+    start_character_log(user)
+    users = get_profile_data()
+
+    tier = tier.lower()
+    user_string = str(user.id)
+
+    inventory = users[user_string]["Inventory"]
+    embed_description = ""
+    characters_owned = inventory["Characters"]
+    rare_embed = ""
+    sr_embed = ""
+    ssr_embed = ""
+    if characters_owned != {}:
+        for element in characters_owned:
+            count = characters_owned[element]["Count"]
+            if element in rare:
+                
+                rare_embed += f"{remoji} **{element}**: {count} \n"
+            elif element in superrare:
+                sr_embed += f"{sremoji} **{element}**: {count} \n"
+            elif element in ssr:
+                ssr_embed += f"{ssremoji} **{element}**: {count} \n"
+            embed_description = f"{ssr_embed}{sr_embed}{rare_embed}"
+    
+    if tier == "all":
+        character_embed = discord.Embed(title = f"{user}'s Owned Characters", description = embed_description)
+    elif tier == "r":
+        character_embed = discord.Embed(title = f"{user}'s Owned Rare Characters", description = rare_embed)
+    elif tier == "sr":
+        character_embed = discord.Embed(title = f"{user}'s Owned SR Characters", description = sr_embed)
+    elif tier == "ssr":
+        character_embed = discord.Embed(title = f"{user}'s Owned SSR Characters", description = ssr_embed)
+    else:
+        character_embed = discord.Embed(title = "Sorry, this is not a tier.", description = "Please choose from R, SR, and SSR.")
+        
+    await ctx.send(embed = character_embed)
 
 @bot.hybrid_command()
 async def sell(ctx: commands.Context, item, amount = 1):
@@ -218,44 +296,75 @@ async def buy(ctx: commands.Context, item, amount = 1):
     user = ctx.author
     open_account(user)
     create_inventory(user)
+    key_items = get_keyitem_data()
     users = get_profile_data()
     user_string = str(user.id)
-    inventory = users[user_string]["Inventory"]
+    inventory = users[user_string]["Inventory"]["Item Inventory"]
+    key_inventory = key_items[user_string]["Inventory"]
     item = format(item)
+    bought = False
 
-    if item not in shop_prices:
+    if item not in shop_prices and item not in keyshop_prices:
         await ctx.send(f"I'm sorry., {user}, we don't have {item} at the moment. Please check again later!")
     elif amount < 0:
         await ctx.send("Are you trying to scam me?")
     else:
-        cost = shop_prices[item] * amount
-        
 
-        if cost > users[user_string]["Balance"]:
-            await ctx.send("You do not have enough money for this transaction.")
-        
-        else:  
-            if item not in inventory:
-                users[user_string]["Inventory"]["Item Inventory"][item] = {"Count": 0}
-            
-            users[user_string]["Balance"] -= cost
-            users[user_string]["Inventory"]["Item Inventory"][item]["Count"] += amount
 
-            with open("la_economia.json", "w") as f:
-                json.dump(users, f)
+        if item in shop_prices:
+            cost = shop_prices[item] * amount
+    
+            if cost > users[user_string]["Balance"]:
+                await ctx.send("You do not have enough money for this transaction.")
+            else:
+                if item not in inventory:
+                    users[user_string]["Inventory"]["Item Inventory"][item] = {"Count": 0}
+                    
+
+                users[user_string]["Inventory"]["Item Inventory"][item]["Count"] += amount
+                users[user_string]["Balance"] -= cost
+                bought = True
+
+        elif item in keyshop_prices:
+            cost = keyshop_prices[item]
+            if cost > users[user_string]["Balance"]:
+                await ctx.send("You do not have enough money for this transaction.")
+            elif item not in key_inventory:
+                key_items[user_string]["Inventory"][item] = {}
+                users[user_string]["Balance"] -= cost
+                bought = True
+            else: await ctx.send(f"You already have the key item: **{item}**")
+                
+        
+        with open("la_economia.json", "w") as f:
+            json.dump(users, f)
+        with open("keyitems.json", "w") as f:
+            json.dump(key_items, f)
+        if bought:
             await ctx.send(f"{amount} {item}/s bought for {cost} {coin_emoji}!")
     
 @bot.hybrid_command()
 async def shop(ctx:commands.Context):
-    embed = discord.Embed(title = "**Altheris' Shop**", description = "")
+    user = ctx.author
+    open_keyitems(user)
+    key_items_per_player = get_keyitem_data()
+    user_string = str(user.id)
+    key_items_owned = key_items_per_player[user_string]["Inventory"]
+
+
+    embed = discord.Embed(title = "**Altheris' Shop**", description = "# Normal Shop\n")
     for element in shop_prices:
-        embed.description += f"**{element}** ({shop_prices[element]} G) \n"
+        embed.description += f"**{element}** ({shop_prices[element]} {coin_emoji}) \n"
+    embed.description += "\n# Key Item Shop\n"
+    for element in keyshop_prices:
+
+        if element not in key_items_owned:
+            embed.description += f"**{element}** ({keyshop_prices[element]}{coin_emoji})\n"
 
     await ctx.send(embed = embed)
 
+    
 
-
-        
 # casino commands here 
 
 @bot.hybrid_command()
@@ -273,7 +382,6 @@ async def race(ctx: commands.Context, golem, bet = 5):
     elif is_valid_bet:
         users[user_string]["Balance"] -= bet
         results = golem_race()
-        print(results)
         first_place = results[0]
         second_place = results[1]
         third_place = results[2]
@@ -385,21 +493,27 @@ async def donate(ctx: commands.Context, receiver: discord.Member, donation=0):
 async def equip(ctx: commands.Context, item):
     item = format(item)
     user = ctx.author
-    users = get_profile_data()
     create_inventory(user)
+    users = get_profile_data()
+    key_items = get_keyitem_data()
+    
     user_string = str(user.id)
 
-    inventory = users[user_string]["Inventory"]["Item Inventory"]
+    inventory = key_items[user_string]["Inventory"]
 
-    if item not in inventory:
+    if item not in inventory and item not in users[user_string]["Inventory"]["Item Inventory"]:
         await ctx.send(f"{user}, you don't have {item}")
+    elif item not in rod_modifiers:
+        await ctx.send(f"Um, {user}? You're not supposed to use {item} to fish...")
     else:
-        users[user_string]["Inventory"]["Item Inventory"]["Default Rod"] = {"Count": 1}
+        key_items[user_string]["Inventory"]["Default Rod"] = {}
         users[user_string]["Equipped"] = item
         await ctx.send(f"{user} has equipped {item}")
 
     with open("la_economia.json", "w") as f:
-        json.dump(users, f)   
+        json.dump(users, f)  
+    with open("keyitems.json", "w") as f:
+        json.dump(key_items, f)
 
 
 
