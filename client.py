@@ -44,6 +44,8 @@ with open("keyshop_items.json", "r") as f:
     keyshop_prices = json.load(f)
 with open("rod_modifiers.json", "r") as f:
     rod_modifiers = json.load(f)
+with open("char_modifiers.json", "r") as f:
+    char_modifiers = json.load(f)
 
 
 
@@ -163,6 +165,12 @@ async def profile(ctx: commands.Context):
 
     balance = users[user_string]["Balance"]
     prismatic_shards = users[user_string]["Prismatic Shards"]
+    if "ProfileIcon" not in users[user_string]:
+        users[user_string]["ProfileIcon"] = {}
+        profileicon = "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/defaultsprite.png"
+    else:
+        profileicon = users[user_string]["ProfileIcon"]
+
     if "Equipped" not in users[user_string]:
         users[user_string]["Equipped"] = {}
         equipped_rod = "No rod equipped"
@@ -178,7 +186,7 @@ async def profile(ctx: commands.Context):
                             #description = "STR 1\tDEX 1\tCON 1\tINT 1\tWIS 1\tCHA 1"
                             inline = False
                             )
-    economy_embed.set_thumbnail(url='https://asteria.s-ul.eu/CzedhEhn.png',)
+    economy_embed.set_thumbnail(url=f'{profileicon}',)
     economy_embed.add_field(name = "Gold", value = f'{coin_emoji} {balance}', inline = True)
     economy_embed.add_field(name = "Equipped Rod", value = f'{rodemoji} {equipped_rod}', inline = True)
     economy_embed.add_field(name = "Prismatic Shards", value = f'{diamond_emoji} {prismatic_shards}', inline = False)
@@ -379,6 +387,40 @@ async def shop(ctx:commands.Context):
             embed.description += f"**{element}** ({coin_emoji}{keyshop_prices[element]})\n"
 
     await ctx.send(embed = embed)
+
+
+# personalization commands
+@bot.hybrid_command()
+async def seticon(ctx:commands.Context, setchar):
+    user = ctx.author
+    create_inventory(user)
+    start_character_log(user)
+    users = get_profile_data()
+    setchar = format(setchar)
+    #tier = tier.lower()
+    user_string = str(user.id)
+
+    inventory = users[user_string]["Inventory"]
+    characters_owned = inventory["Characters"]
+    iconlink = ""
+
+    if setchar not in characters_owned:
+        await ctx.send(f"You don't have this character, {user}.")
+        
+    else:
+        if "Icon" in char_modifiers[setchar]:
+            iconlink = char_modifiers[setchar]["Icon"]
+        else:
+            iconlink = "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/defaultsprite.png"
+
+        users[user_string]["ProfileIcon"] = iconlink
+        print(iconlink)
+        await ctx.send(f"{user} has changed their icon to {setchar}.")
+
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)   
+
+
 
     
 
