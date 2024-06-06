@@ -10,10 +10,10 @@ def golem_race():
 
 
 # Bet Rewards Reference
-# For first place, gain 20x what you bet.
+# For first place, gain 10x what you bet.
 # For second place, gain 2x what you bet.
 # For third place, lose 2x what you bet.
-# For fourth place, lose 20x what you bet.
+# For fourth place, lose 10x what you bet.
 
 # Other stuff todo
 # Add bet & golem selection

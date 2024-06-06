@@ -534,7 +534,7 @@ async def claim(ctx: commands.Context):
         users[user_string]["Prismatic Shards"] += 1300
         await ctx.send(f"Here's today's share, {user}. 100 {coin_emoji} and 1300 {diamond_emoji}. Don't spend it all at once, okay?")
     else:
-        users[user_string]["Balance"] = 100
+        users[user_string]["Balance"] = 0
         await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible, okay?")
 
     with open("la_economia.json", "w") as f:
