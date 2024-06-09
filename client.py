@@ -35,6 +35,7 @@ diamond_emoji = '\U0001F48E'
 remoji = '\U0001F539'
 sremoji = '\U0001F537'
 ssremoji = '\U0001F536'
+rodemoji = '\U0001F3A3'
 with open("fish_prices.json", 'r') as f:
     fish_prices = json.load(f)
 with open("shop_items.json", "r") as f:
@@ -43,6 +44,8 @@ with open("keyshop_items.json", "r") as f:
     keyshop_prices = json.load(f)
 with open("rod_modifiers.json", "r") as f:
     rod_modifiers = json.load(f)
+with open("char_modifiers.json", "r") as f:
+    char_modifiers = json.load(f)
 
 
 
@@ -153,7 +156,7 @@ async def gacha(ctx: commands.Context, pulls = 1):
 
 
 @bot.hybrid_command()
-async def bal(ctx: commands.Context):
+async def profile(ctx: commands.Context):
     user = ctx.author
     open_account(user)
     users = get_profile_data()
@@ -162,10 +165,38 @@ async def bal(ctx: commands.Context):
 
     balance = users[user_string]["Balance"]
     prismatic_shards = users[user_string]["Prismatic Shards"]
+    if "ProfileIcon" not in users[user_string]:
+        users[user_string]["ProfileIcon"] = {}
+        profileicon = "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/defaultsprite.png"
+    else:
+        profileicon = users[user_string]["ProfileIcon"]
+
+    if "Equipped" not in users[user_string]:
+        users[user_string]["Equipped"] = {}
+        equipped_rod = "No rod equipped"
+    else:
+        equipped_rod = users[user_string]["Equipped"]
+
+    if "Persona" not in users[user_string]:
+        users[user_string]["Persona"] = {}
+        persona = "No ID equipped."
+    else:
+        persona = users[user_string]["Persona"]
 
 
-    economy_embed = discord.Embed(title = f'**{user}**',
-                          description = f'{coin_emoji} {balance} \n {diamond_emoji} {prismatic_shards}')
+    economy_embed = discord.Embed(
+        title = f'**{user}**\'s Profile',
+        #description = f'{coin_emoji} {balance} \n {diamond_emoji} {prismatic_shards}'
+        )
+    economy_embed.add_field(name = f'{persona}', value = 'STR 1 | DEX 1 | CON 1 | INT 1 | WIS 1 | CHA 1', #placeholder
+                            #description = "STR 1\tDEX 1\tCON 1\tINT 1\tWIS 1\tCHA 1"
+                            inline = False
+                            )
+    economy_embed.set_thumbnail(url=f'{profileicon}',)
+    economy_embed.add_field(name = "Gold", value = f'{coin_emoji} {balance}', inline = True)
+    economy_embed.add_field(name = "Equipped Rod", value = f'{rodemoji} {equipped_rod}', inline = True)
+    economy_embed.add_field(name = "Prismatic Shards", value = f'{diamond_emoji} {prismatic_shards}', inline = False)
+
 
     await ctx.send(embed = economy_embed)
 
@@ -354,15 +385,73 @@ async def shop(ctx:commands.Context):
 
     embed = discord.Embed(title = "**Altheris' Shop**", description = "# Normal Shop\n")
     for element in shop_prices:
-        embed.description += f"**{element}** ({shop_prices[element]} {coin_emoji}) \n"
+        embed.description += f"**{element}** ({coin_emoji}{shop_prices[element]}) \n"
     embed.description += "\n# Key Item Shop\n"
     for element in keyshop_prices:
 
         if element not in key_items_owned:
-            embed.description += f"**{element}** ({keyshop_prices[element]}{coin_emoji})\n"
+            embed.description += f"**{element}** ({coin_emoji}{keyshop_prices[element]})\n"
 
     await ctx.send(embed = embed)
 
+
+# personalization commands
+@bot.hybrid_command()
+async def seticon(ctx:commands.Context, setchar):
+    user = ctx.author
+    create_inventory(user)
+    start_character_log(user)
+    users = get_profile_data()
+    setchar = format(setchar)
+    #tier = tier.lower()
+    user_string = str(user.id)
+
+    inventory = users[user_string]["Inventory"]
+    characters_owned = inventory["Characters"]
+    iconlink = ""
+
+
+    #add check to see if character exists
+    if setchar not in characters_owned:
+        await ctx.send(f"You don't have this character, {user}.")    
+    else:
+        if "Icon" in char_modifiers[setchar]:
+            iconlink = char_modifiers[setchar]["Icon"]
+        else:
+            iconlink = "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/defaultsprite.png"
+
+        users[user_string]["ProfileIcon"] = iconlink
+        print(iconlink)
+        await ctx.send(f"{user} has changed their icon to {setchar}.")
+
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)   
+
+
+@bot.hybrid_command()
+async def setchar(ctx:commands.Context, setchar):
+    user = ctx.author
+    create_inventory(user)
+    start_character_log(user)
+    users = get_profile_data()
+    setchar = format(setchar)
+    #tier = tier.lower()
+    user_string = str(user.id)
+
+    inventory = users[user_string]["Inventory"]
+    characters_owned = inventory["Characters"]
+
+
+
+    #add check to see if character exists
+    if setchar not in characters_owned:
+        await ctx.send(f"You don't have this character, {user}.")    
+    else:
+        users[user_string]["Persona"] = setchar
+        await ctx.send(f"{user} has set their character to {setchar}.")
+
+    with open("la_economia.json", "w") as f:
+        json.dump(users, f)   
     
 
 # casino commands here 
@@ -445,7 +534,7 @@ async def claim(ctx: commands.Context):
         users[user_string]["Prismatic Shards"] += 1300
         await ctx.send(f"Here's today's share, {user}. 100 {coin_emoji} and 1300 {diamond_emoji}. Don't spend it all at once, okay?")
     else:
-        users[user_string]["Balance"] = 100
+        users[user_string]["Balance"] = 0
         await ctx.send(f"*sigh* {user}, have this to get back on your feet. Be more responsible, okay?")
 
     with open("la_economia.json", "w") as f:
@@ -514,8 +603,6 @@ async def equip(ctx: commands.Context, item):
         json.dump(users, f)  
     with open("keyitems.json", "w") as f:
         json.dump(key_items, f)
-
-
 
 
 @bot.event
