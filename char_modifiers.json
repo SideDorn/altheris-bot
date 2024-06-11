@@ -1,21 +1,21 @@
 {
-    "Aranlyre Diceroll": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/aranlyrediceroll.png"},
-    "Rita Dorchadas": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/ritadorchadas.png"},
-    "Ezekiel Guangming": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/ezekielguangming.png"},
-    "Daiyousei": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/daiyousei.png"},
-    "Zhiraion Gaffot": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/zhiraiongaffot.png"},
-    "Finana Ryugu": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/finanaryugu.png"},
-    "Kane Cannequis": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/ssr/kanecannequis.png"},
+    "Aranlyre Diceroll": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/ssr/aranlyrediceroll.png"},
+    "Rita Dorchadas": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/ssr/ritadorchadas.png"},
+    "Ezekiel Guangming": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/ssr/ezekielguangming.png"},
+    "Daiyousei": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/ssr/daiyousei.png"},
+    "Zhiraion Gaffot": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/ssr/zhiraiongaffot.png"},
+    "Finana Ryugu": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/ssr/finanaryugu.png"},
+    "Kane Cannequis": {"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/ssr/kanecannequis.png"},
 
-    "Suzaku Hinomiya":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/suzakuhinomiya.png"},
-    "Rina":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/rina.png"},
-    "Sir Tarcus Flammenwohl":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/sirtarcus.png"},
-    "Oomfie Ellier":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/oomfieellier.png"},
-    "Tia Hellsflame":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/tiahellsflame.png"},
-    "Alan Voidwalker":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/alanvoidwalker.png"},
-    "Arghena":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/arghena.png"},
-    "Astaroth":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/astaroth.png"},
-    "Jahlagtas":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/jahlagtas.png"},
-    "Lind Akeldama":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/userprofile/charsprites/sr/lind.png"}
+    "Suzaku Hinomiya":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/suzakuhinomiya.png"},
+    "Rina":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/rina.png"},
+    "Sir Tarcus Flammenwohl":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/sirtarcus.png"},
+    "Oomfie Ellier":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/oomfieellier.png"},
+    "Tia Hellsflame":{"Icon": "https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/tiahellsflame.png"},
+    "Alan Voidwalker":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/alanvoidwalker.png"},
+    "Arghena":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/arghena.png"},
+    "Astaroth":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/astaroth.png"},
+    "Jahlagtas":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/jahlagtas.png"},
+    "Lind Akeldama":{"Icon":"https://raw.githubusercontent.com/SideDorn/altheris-bot/main/charsprites/sr/lind.png"}
 }
 
