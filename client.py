@@ -20,6 +20,7 @@ from racing import golem_race
 from slots import slotmachine
 from time import sleep
 from casino_helper import bet_checker
+from roll2 import diceroll
 load_dotenv()
 
 
@@ -63,7 +64,14 @@ async def しか(ctx:commands.Context):
     await ctx.send('しかのこのこのここしたんたん \U0001F5E3\U0001F5E3\U0001F5E3 \n https://www.youtube.com/watch?v=dCEMSaho0io')    
 
 
+#roll
+@bot.hybrid_command()
+async def roll(ctx: commands.Context, roll_string):
+    user = ctx.author
+    final_roll, results = diceroll(roll_string)
 
+    await ctx.send(f'{user} rolled *{roll_string}* and rolled **{final_roll}**. ({results})')
+    
 #fishing
 @bot.hybrid_command()
 async def fish(ctx: commands.Context, region):
